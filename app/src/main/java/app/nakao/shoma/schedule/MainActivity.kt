@@ -38,6 +38,9 @@ class MainActivity : AppCompatActivity() {
         val memoArray: Array<Memo> = memo.toTypedArray()
         val viewList: MutableList<Memo> = mutableListOf()
 
+        val adapter = MemoAdapter(this)
+        binding.RV.layoutManager = LinearLayoutManager(this)
+        binding.RV.adapter = adapter
 
         calendarView.setOnDateChangeListener{ view,year,month,dayofmonth ->
             val month2 = month+1
@@ -49,17 +52,19 @@ class MainActivity : AppCompatActivity() {
             Log.d("DateChange", Year + Month + Day)
             Toast.makeText(this, date, Toast.LENGTH_SHORT).show()
 
+            viewList.clear()
+
             for(m in memo){// 拡張for
                 if(m.year == Year && m.month == Month && m.day == Day){
-                    viewList.add(m)
+                    viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
                     Log.d("add", m.day)
                     Log.d("add view", Day)
                 }
             }
 
-            for (view in viewList){
-                Log.d("list", view.day)
-            }
+            adapter.itemClear()
+
+            adapter.addall(viewList)
         }
 
         binding.floatingActionButton.setOnClickListener {
@@ -88,17 +93,6 @@ class MainActivity : AppCompatActivity() {
         if(memo != null){
             adapter.addall(MemoDataList)
         }*/
-
-        val adapter = MemoAdapter(this)
-        RV.layoutManager = LinearLayoutManager(this)
-        RV.adapter = adapter
-
-        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
-        RV.addItemDecoration(dividerItemDecoration)
-
-        if (memo != null){
-            adapter.addall(viewList)
-        }
     }
 
     fun read(): RealmResults<Memo> {

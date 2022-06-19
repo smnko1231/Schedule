@@ -31,6 +31,11 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         notifyDataSetChanged()
     }
 
+    fun itemClear(){
+        this.items.clear()
+        notifyDataSetChanged()
+    }
+
     override fun getItemCount(): Int {
         return items.size
     }
