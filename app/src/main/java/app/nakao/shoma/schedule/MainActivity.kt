@@ -52,7 +52,8 @@ class MainActivity : AppCompatActivity() {
             for(m in memo){// 拡張for
                 if(m.year == Year && m.month == Month && m.day == Day){
                     viewList.add(m)
-                    Log.d("add", m.day + " add view")
+                    Log.d("add", m.day)
+                    Log.d("add view", Day)
                 }
             }
 
@@ -88,7 +89,7 @@ class MainActivity : AppCompatActivity() {
             adapter.addall(MemoDataList)
         }*/
 
-        val adapter = MemoAdapter(this)//memo
+        val adapter = MemoAdapter(this)
         RV.layoutManager = LinearLayoutManager(this)
         RV.adapter = adapter
 
