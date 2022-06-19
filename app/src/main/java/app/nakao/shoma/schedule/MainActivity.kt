@@ -88,7 +88,7 @@ class MainActivity : AppCompatActivity() {
             adapter.addall(MemoDataList)
         }*/
 
-        val adapter = MemoAdapter(this)
+        val adapter = MemoAdapter(this)//memo
         RV.layoutManager = LinearLayoutManager(this)
         RV.adapter = adapter
 
