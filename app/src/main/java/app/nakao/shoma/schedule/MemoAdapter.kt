@@ -42,10 +42,12 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
                 holder.completionButton.text = "完了"
                 holder.lottieAnimationCompleteView.visibility = View.INVISIBLE
             }
-            notifyDataSetChanged()
         }
         holder.container.setOnClickListener {
             val detailIntent = Intent(context,DetailActivity::class.java).run {
+                putExtra("year",item.year)
+                putExtra("month",item.month)
+                putExtra("day",item.day)
                 putExtra("title",item.title)
                 putExtra("content",item.content)
             }

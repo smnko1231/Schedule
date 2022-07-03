@@ -34,9 +34,10 @@ class scheduleEdit : AppCompatActivity() {
             val year = intent.getStringExtra("year")
             val month = intent.getStringExtra("month")
             val day = intent.getStringExtra("day")
+            val isComplete = intent.getBooleanExtra("isComplete",false)
             Log.d("date",year+month+day)
             if (year != null && month != null && day != null) {
-                save(year,month,day ,title,content) 
+                save(year,month,day ,title,content,isComplete)
             }
 
             val mainIntent = Intent(this,MainActivity::class.java)
@@ -44,7 +45,7 @@ class scheduleEdit : AppCompatActivity() {
         }
     }
 
-    fun save(year:String,month:String, day:String, title:String,content:String){
+    fun save(year:String,month:String, day:String, title:String,content:String,isComplete:Boolean){
         val memo: Memo? = read()
         realm.executeTransaction {
             val memo: Memo = it.createObject(Memo::class.java)
@@ -56,6 +57,7 @@ class scheduleEdit : AppCompatActivity() {
             memo.day = day
             memo.title = title
             memo.content = content
+            memo.isComplete = isComplete
 
             Log.d("save", memo.year+ memo.month+memo.day)
         }
@@ -70,3 +72,4 @@ class scheduleEdit : AppCompatActivity() {
         realm.close()
     }
 }
+

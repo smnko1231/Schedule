@@ -22,6 +22,7 @@ class MainActivity : AppCompatActivity() {
     var Year = ""
     var Month = ""
     var Day = ""
+    var IsComplete = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -91,6 +92,7 @@ class MainActivity : AppCompatActivity() {
                 putExtra("year",Year)
                 putExtra("month",Month)
                 putExtra("day",Day)
+                putExtra("isComplete",IsComplete)
             }
 
             startActivity(scheduleEdit)
