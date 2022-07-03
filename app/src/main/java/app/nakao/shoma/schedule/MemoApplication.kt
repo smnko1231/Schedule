@@ -9,9 +9,11 @@ class MemoApplication: Application() {
         super.onCreate()
 
         Realm.init(this)
-        val realmConfiguration = RealmConfiguration.Builder()
+        val realmConfiguration = RealmConfiguration
+            .Builder()
             .allowWritesOnUiThread(true)
             .build()
+        //Realm.deleteRealm(realmConfiguration) //Realmを消す
         Realm.setDefaultConfiguration(realmConfiguration)
     }
 }

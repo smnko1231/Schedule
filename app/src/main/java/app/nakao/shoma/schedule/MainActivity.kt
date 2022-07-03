@@ -7,19 +7,13 @@ import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.CalendarView
-import android.widget.RemoteViews
 import android.widget.Toast
-import androidx.core.view.isVisible
-import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.nakao.shoma.schedule.databinding.ActivityMainBinding
 import com.airbnb.lottie.LottieAnimationView
 import io.realm.Realm
-import io.realm.RealmConfiguration
 import io.realm.RealmResults
-import org.bson.BSON.toInt
-import java.time.Month
 
 class MainActivity : AppCompatActivity() {
 
@@ -32,8 +26,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
+        
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
-        val LottieAnimationView = findViewById<LottieAnimationView>(R.id.LottieAnimetionView)
+        val lottieAnimationCompleteView = findViewById<LottieAnimationView>(R.id.LottieAnimetionCompleteView)
+        val completionButton = findViewById<Button>(R.id.completionButton)
         calendarView.date = System.currentTimeMillis()
         //val floatingActionButton = findViewById<Button>(R.id.floatingActionButton)
         val RV = findViewById<RecyclerView>(R.id.RV)
@@ -45,6 +41,8 @@ class MainActivity : AppCompatActivity() {
         val adapter = MemoAdapter(this)
         binding.RV.layoutManager = LinearLayoutManager(this)
         binding.RV.adapter = adapter
+
+        //lottieAnimationCompleteView.setAnimation(R.raw.completion)
 
         calendarView.setOnDateChangeListener{ view,year,month,dayofmonth ->
             val month2 = month+1
@@ -62,14 +60,20 @@ class MainActivity : AppCompatActivity() {
                 if (m.isComplete == false){
                     if(m.year == Year && m.month == Month && m.day == Day){
                         viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
-                        //LottieAnimationView.visibility = View.VISIBLE
+
+                        //lottieAnimationCompleteView.visibility = View.INVISIBLE
+                        completionButton.text = "完了"
                         Log.d("add", m.day)
                         Log.d("add view", Day)
                     }
                 }else{
                     if(m.year == Year && m.month == Month && m.day == Day){
                         viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
-                        //LottieAnimationView.visibility = View.VISIBLE
+                        //lottieAnimationCompleteView.visibility = View.VISIBLE
+
+                        lottieAnimationCompleteView.playAnimation()
+
+                        completionButton.text = "未完了"
                         Log.d("add", m.day)
                         Log.d("add view", Day)
                     }

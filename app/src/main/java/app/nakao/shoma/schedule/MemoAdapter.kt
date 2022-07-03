@@ -30,7 +30,8 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         holder.titleText.text = item.title
         holder.contentText.text = item.content
         holder.completionButton.setOnClickListener {
-
+            item.isComplete = true
+            notifyDataSetChanged()
         }
         holder.container.setOnClickListener {
             val detailIntent = Intent(context,DetailActivity::class.java).run {
