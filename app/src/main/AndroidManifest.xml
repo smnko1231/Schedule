@@ -11,6 +11,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Schedule">
         <activity
+            android:name=".DetailActivity"
+            android:exported="false" />
+        <activity
             android:name=".scheduleEdit"
             android:exported="false" />
         <activity

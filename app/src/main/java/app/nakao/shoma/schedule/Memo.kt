@@ -10,4 +10,5 @@ open class Memo(
     open var day:String = "",
     open var title:String = "",
     open var content: String = "",
+    open var isComplete: Boolean = false
 ):RealmObject()
