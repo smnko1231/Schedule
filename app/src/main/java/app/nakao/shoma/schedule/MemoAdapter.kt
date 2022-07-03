@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import com.airbnb.lottie.LottieAnimationView
 
 class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
@@ -16,6 +17,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         val contentText: TextView = view.findViewById(R.id.contentText)
         val completionButton: Button = view.findViewById(R.id.completionButton)
         val container: CardView = view.findViewById(R.id.container)
+        val lottieAnimationCompleteView: LottieAnimationView = view.findViewById(R.id.LottieAnimetionCompleteView)
     }
 
     val items: MutableList<Memo> = mutableListOf()
@@ -30,7 +32,16 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         holder.titleText.text = item.title
         holder.contentText.text = item.content
         holder.completionButton.setOnClickListener {
-            item.isComplete = true
+            item.isComplete = !item.isComplete
+
+            if(item.isComplete == true){
+                holder.completionButton.text = "未完了"
+                holder.lottieAnimationCompleteView.visibility = View.VISIBLE
+                holder.lottieAnimationCompleteView.playAnimation()
+            }else{
+                holder.completionButton.text = "完了"
+                holder.lottieAnimationCompleteView.visibility = View.INVISIBLE
+            }
             notifyDataSetChanged()
         }
         holder.container.setOnClickListener {

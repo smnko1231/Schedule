@@ -26,10 +26,10 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
-        
+
         val calendarView = findViewById<CalendarView>(R.id.calendarView)
-        val lottieAnimationCompleteView = findViewById<LottieAnimationView>(R.id.LottieAnimetionCompleteView)
-        val completionButton = findViewById<Button>(R.id.completionButton)
+        //val lottieAnimationCompleteView = findViewById<LottieAnimationView>(R.id.LottieAnimetionCompleteView)
+        //val completionButton = findViewById<Button>(R.id.completionButton)
         calendarView.date = System.currentTimeMillis()
         //val floatingActionButton = findViewById<Button>(R.id.floatingActionButton)
         val RV = findViewById<RecyclerView>(R.id.RV)
@@ -62,7 +62,7 @@ class MainActivity : AppCompatActivity() {
                         viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
 
                         //lottieAnimationCompleteView.visibility = View.INVISIBLE
-                        completionButton.text = "完了"
+
                         Log.d("add", m.day)
                         Log.d("add view", Day)
                     }
@@ -71,9 +71,8 @@ class MainActivity : AppCompatActivity() {
                         viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
                         //lottieAnimationCompleteView.visibility = View.VISIBLE
 
-                        lottieAnimationCompleteView.playAnimation()
+                        //lottieAnimationCompleteView.playAnimation()
 
-                        completionButton.text = "未完了"
                         Log.d("add", m.day)
                         Log.d("add view", Day)
                     }
