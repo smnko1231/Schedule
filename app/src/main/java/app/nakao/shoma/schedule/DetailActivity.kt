@@ -39,7 +39,13 @@ class DetailActivity : AppCompatActivity() {
 
             realm.executeTransaction{
                 task_delete.deleteFromRealm(0)
-                val mainIntent = Intent(this,MainActivity::class.java)
+                val mainIntent = Intent(this,MainActivity::class.java).run {
+                    putExtra("year",year)
+                    putExtra("month",month)
+                    putExtra("day",day)
+                    putExtra("title",title)
+                    putExtra("content",content)
+                }
                 startActivity(mainIntent)
             }
         }
