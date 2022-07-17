@@ -22,6 +22,7 @@ class DetailActivity : AppCompatActivity() {
         val dateTextView = findViewById<TextView>(R.id.dateTextView)
         val deleteButton = findViewById<Button>(R.id.deleteButton)
         val editButton = findViewById<Button>(R.id.editButton)
+        val backButton2 = findViewById<Button>(R.id.backbutton2)
 
         val year = intent.getStringExtra("year")
         val month = intent.getStringExtra("month")
@@ -44,6 +45,14 @@ class DetailActivity : AppCompatActivity() {
         }
 
         editButton.setOnClickListener {
+            val scheduleIntent = Intent(this,scheduleEdit::class.java).run {
+                putExtra("year",year)
+                putExtra("month",month)
+                putExtra("day",day)
+                putExtra("title",title)
+                putExtra("content",content)
+            }
+
             val task_delete = realm.where(Memo::class.java).equalTo("content",content).findAll()
 
             realm.executeTransaction{
@@ -52,14 +61,16 @@ class DetailActivity : AppCompatActivity() {
                 startActivity(mainIntent)
             }
 
-            val scheduleIntent = Intent(this,scheduleEdit::class.java).run {
+            startActivity(scheduleIntent)
+        }
+
+        backButton2.setOnClickListener {
+            val mainIntent = Intent(this,MainActivity::class.java).run {
                 putExtra("year",year)
                 putExtra("month",month)
                 putExtra("day",day)
-                putExtra("title",title)
-                putExtra("content",content)
             }
-            startActivity(scheduleIntent)
+            startActivity(mainIntent)
         }
     }
 

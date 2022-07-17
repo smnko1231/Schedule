@@ -34,13 +34,33 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/titleEdit" />
 
-    <Button
-        android:id="@+id/savebutton"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="80dp"
-        android:text="保存"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/contentsEdit" />
+        app:layout_constraintTop_toBottomOf="@+id/contentsEdit">
+
+        <Button
+            android:id="@+id/savebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="16dp"
+            android:layout_weight="1"
+            android:backgroundTint="#2196F3"
+            android:text="保存" />
+
+        <Button
+            android:id="@+id/backbutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#2196F3"
+            android:text="戻る" />
+    </LinearLayout>
+
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -14,6 +14,9 @@
             android:name=".DetailActivity"
             android:exported="false" />
         <activity
+            android:name=".editActivity"
+            android:exported="true"/>
+        <activity
             android:name=".scheduleEdit"
             android:exported="false" />
         <activity

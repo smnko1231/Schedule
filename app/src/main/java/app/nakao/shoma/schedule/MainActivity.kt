@@ -1,6 +1,7 @@
 package app.nakao.shoma.schedule
 
 import android.content.Intent
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
@@ -8,12 +9,18 @@ import android.view.View
 import android.widget.Button
 import android.widget.CalendarView
 import android.widget.Toast
+import androidx.annotation.RequiresApi
+import androidx.core.view.get
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.nakao.shoma.schedule.databinding.ActivityMainBinding
 import com.airbnb.lottie.LottieAnimationView
 import io.realm.Realm
 import io.realm.RealmResults
+import java.time.LocalDate
+import java.time.ZoneId
+import java.util.*
+import kotlin.math.log
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,6 +31,7 @@ class MainActivity : AppCompatActivity() {
     var Day = ""
     var IsComplete = false
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater).apply { setContentView(this.root) }
@@ -42,6 +50,53 @@ class MainActivity : AppCompatActivity() {
         val adapter = MemoAdapter(this)
         binding.RV.layoutManager = LinearLayoutManager(this)
         binding.RV.adapter = adapter
+
+        val dt = LocalDate.now()
+        val today_year = dt.year//calendarView.get(Calendar.YEAR)
+        val today_month = dt.monthValue
+        val today_day = dt.dayOfMonth
+
+        val intent_year = intent.getStringExtra("year")
+        val intent_month = intent.getStringExtra("month")
+        val intent_day = intent.getStringExtra("day")
+        var intent_date = dt
+        if(intent_day!=null && intent_month!=null && intent_year!=null){
+            intent_date = LocalDate.of(intent_year.toInt(),intent_month.toInt(),intent_day.toInt())
+
+        }
+        val zoneId = ZoneId.systemDefault()
+        val millis = intent_date.atStartOfDay(zoneId).toEpochSecond() * 1000 // あんまりよくないけど
+        Log.d("intent_date",millis.toString())
+        Log.d("intent_date",System.currentTimeMillis().toString())
+        calendarView.date = millis
+
+
+        if (intent_year != null && intent_month != null && intent_day != null){
+            Year = intent_year
+            Month = intent_month
+            Day = intent_day
+        }else{
+            Year = today_year.toString()
+            Month = today_month.toString()
+            Day = today_day.toString()
+        }
+
+        val date = "$Year/$Month/$Day"
+        Toast.makeText(this, date, Toast.LENGTH_SHORT).show()
+        viewList.clear()
+        for(m in memo){// 拡張for
+            if (m.isComplete == false){
+                if(m.year == Year && m.month == Month && m.day == Day){
+                    viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
+                }
+            }else{
+                if(m.year == Year && m.month == Month && m.day == Day){
+                    viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
+                }
+            }
+        }
+        adapter.itemClear()
+        adapter.addall(viewList)
 
         //lottieAnimationCompleteView.setAnimation(R.raw.completion)
 
@@ -80,9 +135,7 @@ class MainActivity : AppCompatActivity() {
                 }
 
             }
-
             adapter.itemClear()
-
             adapter.addall(viewList)
         }
 
@@ -94,7 +147,6 @@ class MainActivity : AppCompatActivity() {
                 putExtra("day",Day)
                 putExtra("isComplete",IsComplete)
             }
-
             startActivity(scheduleEdit)
         }
 
