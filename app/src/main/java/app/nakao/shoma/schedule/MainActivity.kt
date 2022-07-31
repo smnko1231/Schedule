@@ -17,6 +17,7 @@ import app.nakao.shoma.schedule.databinding.ActivityMainBinding
 import com.airbnb.lottie.LottieAnimationView
 import io.realm.Realm
 import io.realm.RealmResults
+import io.realm.kotlin.createObject
 import java.time.LocalDate
 import java.time.ZoneId
 import java.util.*
@@ -87,11 +88,11 @@ class MainActivity : AppCompatActivity() {
         for(m in memo){// 拡張for
             if (m.isComplete == false){
                 if(m.year == Year && m.month == Month && m.day == Day){
-                    viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
+                    viewList.add(Memo(m.id,m.year,m.month,m.day,m.title,m.content,m.isComplete))
                 }
             }else{
                 if(m.year == Year && m.month == Month && m.day == Day){
-                    viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
+                    viewList.add(Memo(m.id,m.year,m.month,m.day,m.title,m.content,m.isComplete))
                 }
             }
         }
@@ -115,7 +116,7 @@ class MainActivity : AppCompatActivity() {
             for(m in memo){// 拡張for
                 if (m.isComplete == false){
                     if(m.year == Year && m.month == Month && m.day == Day){
-                        viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
+                        viewList.add(Memo(m.id,m.year,m.month,m.day,m.title,m.content,m.isComplete))
 
                         //lottieAnimationCompleteView.visibility = View.INVISIBLE
 
@@ -124,7 +125,7 @@ class MainActivity : AppCompatActivity() {
                     }
                 }else{
                     if(m.year == Year && m.month == Month && m.day == Day){
-                        viewList.add(Memo(m.year,m.month,m.day,m.title,m.content))
+                        viewList.add(Memo(m.id,m.year,m.month,m.day,m.title,m.content,m.isComplete))
                         //lottieAnimationCompleteView.visibility = View.VISIBLE
 
                         //lottieAnimationCompleteView.playAnimation()

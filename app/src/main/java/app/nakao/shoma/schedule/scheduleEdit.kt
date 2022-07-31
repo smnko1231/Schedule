@@ -1,12 +1,15 @@
 package app.nakao.shoma.schedule
 
+import android.content.Context
 import android.content.Intent
 import android.icu.text.CaseMap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.provider.Contacts.SettingsColumns.KEY
 import android.util.Log
 import android.widget.Button
 import android.widget.EditText
+import androidx.lifecycle.ViewModel
 import app.nakao.shoma.schedule.databinding.ActivityScheduleEditBinding
 import io.realm.Realm
 
@@ -77,8 +80,12 @@ class scheduleEdit : AppCompatActivity() {
 
     fun save(year:String,month:String, day:String, title:String,content:String,isComplete:Boolean){
         val memo: Memo? = read()
+
+        val sharedPreferences = getSharedPreferences("saveId", Context.MODE_PRIVATE)
+        val saveId = sharedPreferences.getInt("saveId",0)
+        val id = saveId + 1
         realm.executeTransaction {
-            val memo: Memo = it.createObject(Memo::class.java)
+            val memo: Memo = it.createObject(Memo::class.java,id)
             
             memo.year = year
             memo.month = month
@@ -87,8 +94,9 @@ class scheduleEdit : AppCompatActivity() {
             memo.content = content
             memo.isComplete = isComplete
 
-            Log.d("save", memo.year+ memo.month+memo.day)
+            Log.d("save", id.toString() + ":" + memo.year+ memo.month+memo.day)
         }
+        sharedPreferences.edit().putInt("saveId",id).apply()
     }
 
     fun read():Memo? {

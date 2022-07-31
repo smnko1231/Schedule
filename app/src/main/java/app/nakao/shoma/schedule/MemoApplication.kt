@@ -13,7 +13,7 @@ class MemoApplication: Application() {
             .Builder()
             .allowWritesOnUiThread(true)
             .build()
-        //Realm.deleteRealm(realmConfiguration) //Realmを消す
+        Realm.deleteRealm(realmConfiguration) //Realmを消す
         Realm.setDefaultConfiguration(realmConfiguration)
     }
 }

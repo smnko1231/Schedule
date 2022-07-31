@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.airbnb.lottie.LottieAnimationView
+import io.realm.Realm
 
 class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
@@ -20,7 +21,13 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         val lottieAnimationCompleteView: LottieAnimationView = view.findViewById(R.id.LottieAnimetionCompleteView)
     }
 
+    val realm:Realm = Realm.getDefaultInstance()
+
     val items: MutableList<Memo> = mutableListOf()
+
+    var isComplete:Boolean = false
+
+    val memo:Memo? = read()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.activity_recycler_view_adapter,parent,false)
@@ -31,6 +38,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         val item = items[position]
         holder.titleText.text = item.title
         holder.contentText.text = item.content
+
         holder.completionButton.setOnClickListener {
             item.isComplete = !item.isComplete
 
@@ -38,10 +46,14 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
                 holder.completionButton.text = "未完了"
                 holder.lottieAnimationCompleteView.visibility = View.VISIBLE
                 holder.lottieAnimationCompleteView.playAnimation()
+                isComplete = true
             }else{
                 holder.completionButton.text = "完了"
                 holder.lottieAnimationCompleteView.visibility = View.INVISIBLE
+                isComplete = false
             }
+
+            //updateRealm()
         }
         holder.container.setOnClickListener {
             val detailIntent = Intent(context,DetailActivity::class.java).run {
@@ -65,7 +77,27 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         notifyDataSetChanged()
     }
 
+    /*
+    override fun onDestroy(){
+        super.onDestroy()
+        realm.close()
+    }*/
+
+    fun read(): Memo?{
+        return realm.where(Memo::class.java).findFirst()
+    }
+
     override fun getItemCount(): Int {
         return items.size
+    }
+
+    private fun updateRealm(id:Int, newCompletestate: Boolean){
+        val target = realm.where(Memo::class.java)
+            .equalTo("id",id)
+            .findFirst()
+
+        realm.executeTransaction {
+            target?.isComplete = newCompletestate
+        }
     }
 }
