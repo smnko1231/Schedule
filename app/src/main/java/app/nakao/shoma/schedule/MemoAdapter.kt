@@ -39,6 +39,17 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         holder.titleText.text = item.title
         holder.contentText.text = item.content
 
+        if(item.isComplete == true){
+            holder.completionButton.text = "未完了"
+            holder.lottieAnimationCompleteView.visibility = View.VISIBLE
+            holder.lottieAnimationCompleteView.playAnimation()
+            isComplete = true
+        }else{
+            holder.completionButton.text = "完了"
+            holder.lottieAnimationCompleteView.visibility = View.INVISIBLE
+            isComplete = false
+        }
+
         holder.completionButton.setOnClickListener {
             item.isComplete = !item.isComplete
 
@@ -53,7 +64,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
                 isComplete = false
             }
 
-            //updateRealm()
+            updateRealm(item.id,isComplete)
         }
         holder.container.setOnClickListener {
             val detailIntent = Intent(context,DetailActivity::class.java).run {
