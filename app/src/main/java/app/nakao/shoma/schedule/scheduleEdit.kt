@@ -85,8 +85,9 @@ class scheduleEdit : AppCompatActivity() {
         val saveId = sharedPreferences.getInt("saveId",0)
         val id = saveId + 1
         realm.executeTransaction {
-            val memo: Memo = it.createObject(Memo::class.java,id)
+            val memo: Memo = it.createObject(Memo::class.java)
             
+            memo.id = id
             memo.year = year
             memo.month = month
             memo.day = day

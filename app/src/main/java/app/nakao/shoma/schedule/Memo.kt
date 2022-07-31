@@ -5,7 +5,7 @@ import io.realm.annotations.PrimaryKey
 import java.time.LocalDate
 
 open class Memo(
-    open var id:Int,
+    open var id:Int = 0,
     open var year:String = "",
     open var month:String = "",
     open var day:String = "",
