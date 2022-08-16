@@ -17,7 +17,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         val titleText: TextView = view.findViewById(R.id.titleText)
         val contentText: TextView = view.findViewById(R.id.contentText)
         val completionButton: Button = view.findViewById(R.id.completionButton)
-        val container: CardView = view.findViewById(R.id.container)
+        val container: CardView = view.findViewById(R.id.adapter)
         val lottieAnimationCompleteView: LottieAnimationView = view.findViewById(R.id.LottieAnimetionCompleteView)
     }
 
@@ -73,6 +73,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
                 putExtra("day",item.day)
                 putExtra("title",item.title)
                 putExtra("content",item.content)
+                putExtra("isComplete",item.isComplete)
             }
             context.startActivity(detailIntent)
         }

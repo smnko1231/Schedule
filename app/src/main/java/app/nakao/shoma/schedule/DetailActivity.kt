@@ -5,7 +5,9 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
+import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
+import androidx.appcompat.app.AlertDialog
 
 class DetailActivity : AppCompatActivity() {
 
@@ -29,34 +31,49 @@ class DetailActivity : AppCompatActivity() {
         val day = intent.getStringExtra("day")
         val title = intent.getStringExtra("title")
         val content = intent.getStringExtra("content")
+        val isComplete = intent.getBooleanExtra("isComplete",false)
 
         dateTextView.text = intent.getStringExtra("year")+"年"+intent.getStringExtra("month")+"月"+intent.getStringExtra("day")+"日"
         titleTextView.text = intent.getStringExtra("title")
         contentTextView.text = intent.getStringExtra("content")
 
         deleteButton.setOnClickListener {
-            val task_delete = realm.where(Memo::class.java).equalTo("content",content).findAll()
+            AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+                .setTitle("タイトル:"+titleTextView.text+"\n"+"内容:"+contentTextView.text)
+                .setMessage("削除しますか?")
+                .setPositiveButton("はい", { dialog, which ->
+                    val task_delete = realm.where(Memo::class.java).equalTo("content",content).findAll()
 
-            realm.executeTransaction{
-                task_delete.deleteFromRealm(0)
-                val mainIntent = Intent(this,MainActivity::class.java).run {
-                    putExtra("year",year)
-                    putExtra("month",month)
-                    putExtra("day",day)
-                    putExtra("title",title)
-                    putExtra("content",content)
-                }
-                startActivity(mainIntent)
-            }
+                    realm.executeTransaction{
+                        task_delete.deleteFromRealm(0)
+                        val mainIntent = Intent(this,MainActivity::class.java).run {
+                            val condition = 2
+                            putExtra("year",year)
+                            putExtra("month",month)
+                            putExtra("day",day)
+                            putExtra("title",title)
+                            putExtra("content",content)
+                            putExtra("isComplete",isComplete)
+                            putExtra("condition",condition)
+                        }
+                        startActivity(mainIntent)
+                    }
+                })
+                .setNegativeButton("いいえ", { dialog, which ->
+
+                })
+                .show()
         }
 
         editButton.setOnClickListener {
             val scheduleIntent = Intent(this,scheduleEdit::class.java).run {
+                val condition = 3
                 putExtra("year",year)
                 putExtra("month",month)
                 putExtra("day",day)
                 putExtra("title",title)
                 putExtra("content",content)
+                putExtra("condition",condition)
             }
 
             val task_delete = realm.where(Memo::class.java).equalTo("content",content).findAll()

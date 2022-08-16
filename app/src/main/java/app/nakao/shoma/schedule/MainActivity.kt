@@ -10,11 +10,14 @@ import android.widget.Button
 import android.widget.CalendarView
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.view.get
+import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import app.nakao.shoma.schedule.databinding.ActivityMainBinding
 import com.airbnb.lottie.LottieAnimationView
+import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import io.realm.RealmResults
 import io.realm.kotlin.createObject
@@ -43,6 +46,7 @@ class MainActivity : AppCompatActivity() {
         calendarView.date = System.currentTimeMillis()
         //val floatingActionButton = findViewById<Button>(R.id.floatingActionButton)
         val RV = findViewById<RecyclerView>(R.id.RV)
+        val container = findViewById<ConstraintLayout>(R.id.container)
 
         val memo:RealmResults<Memo> = read()
         val memoArray: Array<Memo> = memo.toTypedArray()
@@ -51,6 +55,8 @@ class MainActivity : AppCompatActivity() {
         val adapter = MemoAdapter(this)
         binding.RV.layoutManager = LinearLayoutManager(this)
         binding.RV.adapter = adapter
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
+        binding.RV.addItemDecoration(dividerItemDecoration)
 
         val dt = LocalDate.now()
         val today_year = dt.year//calendarView.get(Calendar.YEAR)
@@ -60,15 +66,38 @@ class MainActivity : AppCompatActivity() {
         val intent_year = intent.getStringExtra("year")
         val intent_month = intent.getStringExtra("month")
         val intent_day = intent.getStringExtra("day")
+        val intent_title = intent.getStringExtra("title")
+        val intent_content = intent.getStringExtra("content")
+        val intent_isComplete = intent.getBooleanExtra("isComplete",false)
         var intent_date = dt
+        val intent_condition = intent.getIntExtra("condition",0)
         if(intent_day!=null && intent_month!=null && intent_year!=null){
             intent_date = LocalDate.of(intent_year.toInt(),intent_month.toInt(),intent_day.toInt())
+        }
 
+        if (intent_condition != null){
+            if (intent_condition == 1){
+                Snackbar.make(container,"保存しました!",Snackbar.LENGTH_SHORT).show()
+            }else if (intent_condition == 2){
+                Snackbar.make(container,"削除しました!",Snackbar.LENGTH_SHORT)
+                    .setAction("元に戻す"){
+                        val scheduleIntent = Intent(this,scheduleEdit::class.java).run {
+                            putExtra("year",intent_year)
+                            putExtra("month",intent_month)
+                            putExtra("day",intent_day)
+                            putExtra("title",intent_title)
+                            putExtra("content",intent_content)
+                            putExtra("isComplete",intent_isComplete)
+                        }
+                        startActivity(scheduleIntent)
+                    }
+                    .show()
+            }else if (intent_condition == 3){
+                Snackbar.make(container,"編集しました!",Snackbar.LENGTH_SHORT).show()
+            }
         }
         val zoneId = ZoneId.systemDefault()
         val millis = intent_date.atStartOfDay(zoneId).toEpochSecond() * 1000 // あんまりよくないけど
-        Log.d("intent_date",millis.toString())
-        Log.d("intent_date",System.currentTimeMillis().toString())
         calendarView.date = millis
 
 
@@ -107,9 +136,7 @@ class MainActivity : AppCompatActivity() {
             Month = "$month2"
             Day = "$dayofmonth"
             val date = "$year/$month2/$dayofmonth"
-
-            Log.d("DateChange", Year + Month + Day)
-            Toast.makeText(this, date, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, date, Toast.LENGTH_LONG).show()
 
             viewList.clear()
 
@@ -117,21 +144,10 @@ class MainActivity : AppCompatActivity() {
                 if (m.isComplete == false){
                     if(m.year == Year && m.month == Month && m.day == Day){
                         viewList.add(Memo(m.id,m.year,m.month,m.day,m.title,m.content,m.isComplete))
-
-                        //lottieAnimationCompleteView.visibility = View.INVISIBLE
-
-                        Log.d("add", m.day)
-                        Log.d("add view", Day)
                     }
                 }else{
                     if(m.year == Year && m.month == Month && m.day == Day){
                         viewList.add(Memo(m.id,m.year,m.month,m.day,m.title,m.content,m.isComplete))
-                        //lottieAnimationCompleteView.visibility = View.VISIBLE
-
-                        //lottieAnimationCompleteView.playAnimation()
-
-                        Log.d("add", m.day)
-                        Log.d("add view", Day)
                     }
                 }
 
@@ -150,22 +166,6 @@ class MainActivity : AppCompatActivity() {
             }
             startActivity(scheduleEdit)
         }
-
-        /*val memo: Memo? = read()
-
-        val adapter = MemoAdapter(this)
-        RV.layoutManager = LinearLayoutManager(this)
-        RV.adapter = adapter
-
-        val MemoData: RealmResults<Memo> = realm.where(Memo::class.java).findAll()
-        var MemoDataList: List<Memo> = MemoData.subList(0,MemoData.size)
-
-        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
-        RV.addItemDecoration(dividerItemDecoration)
-
-        if(memo != null){
-            adapter.addall(MemoDataList)
-        }*/
     }
 
     fun read(): RealmResults<Memo> {
