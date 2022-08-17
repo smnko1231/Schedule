@@ -59,9 +59,10 @@ class MainActivity : AppCompatActivity() {
         binding.RV.addItemDecoration(dividerItemDecoration)
 
         val dt = LocalDate.now()
-        val today_year = dt.year//calendarView.get(Calendar.YEAR)
+        val today_year = dt.year
         val today_month = dt.monthValue
         val today_day = dt.dayOfMonth
+        val dayOfYear = dt.dayOfYear
 
         val intent_year = intent.getStringExtra("year")
         val intent_month = intent.getStringExtra("month")
@@ -96,10 +97,6 @@ class MainActivity : AppCompatActivity() {
                 Snackbar.make(container,"編集しました!",Snackbar.LENGTH_SHORT).show()
             }
         }
-        val zoneId = ZoneId.systemDefault()
-        val millis = intent_date.atStartOfDay(zoneId).toEpochSecond() * 1000 // あんまりよくないけど
-        calendarView.date = millis
-
 
         if (intent_year != null && intent_month != null && intent_day != null){
             Year = intent_year
@@ -110,6 +107,10 @@ class MainActivity : AppCompatActivity() {
             Month = today_month.toString()
             Day = today_day.toString()
         }
+
+        val zoneId = ZoneId.systemDefault()
+        val millis = intent_date.atStartOfDay(zoneId).toEpochSecond() * 1000 // あんまりよくないけど
+        calendarView.date = millis
 
         val date = "$Year/$Month/$Day"
         Toast.makeText(this, date, Toast.LENGTH_SHORT).show()
@@ -163,8 +164,25 @@ class MainActivity : AppCompatActivity() {
                 putExtra("month",Month)
                 putExtra("day",Day)
                 putExtra("isComplete",IsComplete)
+                putExtra("epochDay",millis)
             }
             startActivity(scheduleEdit)
+        }
+
+        binding.returnTodayButton.setOnClickListener {
+            val millis = dt.atStartOfDay(zoneId).toEpochSecond() * 1000 // あんまりよくないけど
+            calendarView.date = millis
+
+            val date = "$today_year/$today_month/$today_day"
+            Toast.makeText(this, date, Toast.LENGTH_SHORT).show()
+            viewList.clear()
+            for(m in memo){
+                if(m.year == today_year.toString() && m.month == today_month.toString() && m.day == today_day.toString()){
+                    viewList.add(Memo(m.id,m.year,m.month,m.day,m.title,m.content,m.isComplete))
+                }
+            }
+            adapter.itemClear()
+            adapter.addall(viewList)
         }
     }
 

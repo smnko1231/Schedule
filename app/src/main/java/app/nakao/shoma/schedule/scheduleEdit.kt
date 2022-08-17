@@ -2,6 +2,7 @@ package app.nakao.shoma.schedule
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Color
 import android.icu.text.CaseMap
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -10,6 +11,7 @@ import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
+import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModel
 import app.nakao.shoma.schedule.databinding.ActivityScheduleEditBinding
@@ -17,6 +19,7 @@ import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import java.time.DayOfWeek
 import java.time.Month
+import java.time.ZoneId
 import java.util.*
 
 class scheduleEdit : AppCompatActivity() {
@@ -36,11 +39,6 @@ class scheduleEdit : AppCompatActivity() {
         val repeatDaySwich = findViewById<Switch>(R.id.repeatDaySwich)
         val repeatMonthSwich = findViewById<Switch>(R.id.repeatMonthSwich)
         val repeatWeekSwich = findViewById<Switch>(R.id.repeatWeekSwich)
-        /*val day_swich = findViewById<Switch>(R.id.day_swich)
-        val week_swich = findViewById<Switch>(R.id.week_swich)
-        val month_swich = findViewById<Switch>(R.id.month_swich)
-        var repeat = 0*/
-        //val saveButton = findViewById<Button>(R.id.savebutton)
 
         val memo: Memo? = read()
 
@@ -57,36 +55,71 @@ class scheduleEdit : AppCompatActivity() {
         binding.savebutton.setOnClickListener {
             val title: String = titleEdit.text.toString()
             val content: String = contentsEdit.text.toString()
-            val year = intent.getStringExtra("year")
-            val month = intent.getStringExtra("month")
+            var year = intent.getStringExtra("year")
+            var month = intent.getStringExtra("month")
             var day = intent.getStringExtra("day")
             var day_int = day?.toInt()
+            var month_int = month?.toInt()
             val isComplete = intent.getBooleanExtra("isComplete",false)
             var intent_condition = intent.getIntExtra("condition",1)
 
-            if (year != null && month != null && day != null) {
-                if (repeat == 0){
-                    save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
-                }else if (repeat == 1){
-                    Log.d("repeat",repeat.toString())
-                    for (i in 1..100){
+            if (title.equals("")){
+                AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+                    .setTitle("タイトルが入力されていません")
+                    .setMessage("タイトルを入力してください")
+                    .setPositiveButton("OK", { dialog, which ->
+
+                    })
+                    .show()
+            }else if (content.equals("")){
+                AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+                    .setTitle("内容が入力されていません")
+                    .setMessage("内容を入力してください")
+                    .setPositiveButton("OK", { dialog, which ->
+
+                    })
+                    .show()
+            }else{
+                if (year != null && month != null && day != null) {
+                    if (repeatDaySwich.isChecked == false &&  repeatWeekSwich.isChecked == false && repeatMonthSwich.isChecked == false){
                         save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
-                        if (day_int != null){
-                            day_int = day_int+1
+                    }else if (repeatDaySwich.isChecked == true &&  repeatWeekSwich.isChecked == false && repeatMonthSwich.isChecked == false){
+                        Log.d("repeat",repeat.toString())
+                        for (i in 1..31){
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                            if (day_int != null){
+                                day_int++
+                            }
+                            day = day_int.toString()
+                            Log.d("day",day.toString())
                         }
-                        day = day_int.toString()
-                        Log.d("day",day.toString())
+                    }else if (repeatDaySwich.isChecked == false &&  repeatWeekSwich.isChecked == true && repeatMonthSwich.isChecked == false){
+                        for (i in 1..10){
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                            if (day_int != null){
+                                day_int = day_int+7
+                            }
+                            day = day_int.toString()
+                        }
+                    }else if (repeatDaySwich.isChecked == false &&  repeatWeekSwich.isChecked == false && repeatMonthSwich.isChecked == true){
+                        for (i in 1..12){
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                            if (month_int != null){
+                                month_int++
+                            }
+                            month = month_int.toString()
+                        }
                     }
                 }
-            }
 
-            val mainIntent = Intent(this,MainActivity::class.java).run {
-                putExtra("year",year)
-                putExtra("month",month)
-                putExtra("day",day)
-                putExtra("condition",intent_condition)
+                val mainIntent = Intent(this,MainActivity::class.java).run {
+                    putExtra("year",year)
+                    putExtra("month",month)
+                    putExtra("day",day)
+                    putExtra("condition",intent_condition)
+                }
+                startActivity(mainIntent)
             }
-            startActivity(mainIntent)
         }
 
         binding.backbutton.setOnClickListener {
@@ -107,21 +140,39 @@ class scheduleEdit : AppCompatActivity() {
             startActivity(mainIntent)
         }
 
+        /*if (titleEdit.text == null || contentsEdit.text == null){
+            Log.d("isEnabled",titleEdit.text.toString())
+            binding.savebutton.isEnabled = false
+            binding.savebutton.setBackgroundColor(Color.rgb(125,125,125))
+        }else{
+            Log.d("isEnabled",titleEdit.text.toString())
+            binding.savebutton.isEnabled = true
+            binding.savebutton.setBackgroundColor(Color.rgb(33,150,243))
+        }*/
+
         repeatDaySwich.setOnCheckedChangeListener { compoundButton, isChecked ->
-            repeat = 1
-            
+            Log.d("repeatDay",repeatDaySwich.isChecked.toString())
+            Log.d("repeatWeek",repeatWeekSwich.isChecked.toString())
+            Log.d("repeatMonth",repeatMonthSwich.isChecked.toString())
+            //repeat = 1
             repeatMonthSwich.isChecked = false
             repeatWeekSwich.isChecked = false
         }
 
         repeatWeekSwich.setOnCheckedChangeListener { compoundButton, isChecked ->
-            repeat = 2
+            Log.d("repeatDay",repeatDaySwich.isChecked.toString())
+            Log.d("repeatWeek",repeatWeekSwich.isChecked.toString())
+            Log.d("repeatMonth",repeatMonthSwich.isChecked.toString())
+            //repeat = 2
             repeatMonthSwich.isChecked = false
             repeatDaySwich.isChecked = false
         }
 
         repeatMonthSwich.setOnCheckedChangeListener { compoundButton, isChecked ->
-            repeat = 3
+            Log.d("repeatDay",repeatDaySwich.isChecked.toString())
+            Log.d("repeatWeek",repeatWeekSwich.isChecked.toString())
+            Log.d("repeatMonth",repeatMonthSwich.isChecked.toString())
+            //repeat = 3
             repeatDaySwich.isChecked = false
             repeatWeekSwich.isChecked = false
         }
@@ -133,22 +184,27 @@ class scheduleEdit : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("saveId", Context.MODE_PRIVATE)
         val saveId = sharedPreferences.getInt("saveId",0)
         val id = saveId + 1
-        if (title != null && content != null){
-            realm.executeTransaction {
-                val memo: Memo = it.createObject(Memo::class.java)
+        /*if (title != null && content != null){
+            binding.savebutton.isEnabled = false
+            binding.savebutton.setBackgroundColor(Color.rgb(125,125,125))
+        }else{
+            binding.savebutton.isEnabled = true
+            binding.savebutton.setBackgroundColor(Color.rgb(33,150,243))
+        }*/
+        realm.executeTransaction {
+            val memo: Memo = it.createObject(Memo::class.java)
 
-                memo.id = id
-                memo.year = year
-                memo.month = month
-                memo.day = day
-                memo.title = title
-                memo.content = content
-                memo.isComplete = isComplete
+            memo.id = id
+            memo.year = year
+            memo.month = month
+            memo.day = day
+            memo.title = title
+            memo.content = content
+            memo.isComplete = isComplete
 
-                Log.d("save", id.toString() + ":" +memo.year+ memo.month+memo.day)
-            }
-            sharedPreferences.edit().putInt("saveId",id).apply()
+            Log.d("save", id.toString() + ":" +memo.year+ memo.month+memo.day)
         }
+        sharedPreferences.edit().putInt("saveId",id).apply()
     }
 
     fun read():Memo? {

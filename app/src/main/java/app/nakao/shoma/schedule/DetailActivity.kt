@@ -42,7 +42,11 @@ class DetailActivity : AppCompatActivity() {
                 .setTitle("タイトル:"+titleTextView.text+"\n"+"内容:"+contentTextView.text)
                 .setMessage("削除しますか?")
                 .setPositiveButton("はい", { dialog, which ->
-                    val task_delete = realm.where(Memo::class.java).equalTo("content",content).findAll()
+                    val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
+                    val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
+                    val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day).findAll()
+                    val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month).findAll()
+                    val task_delete = task_delete_tmp4.where().equalTo("year",year).findAll()
 
                     realm.executeTransaction{
                         task_delete.deleteFromRealm(0)
