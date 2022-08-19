@@ -9,6 +9,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
+import app.nakao.shoma.schedule.databinding.ActivityDetailBinding
 import com.airbnb.lottie.LottieAnimationView
 import io.realm.Realm
 
@@ -88,12 +89,6 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         this.items.clear()
         notifyDataSetChanged()
     }
-
-    /*
-    override fun onDestroy(){
-        super.onDestroy()
-        realm.close()
-    }*/
 
     fun read(): Memo?{
         return realm.where(Memo::class.java).findFirst()

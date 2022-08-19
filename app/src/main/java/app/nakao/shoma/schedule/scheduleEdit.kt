@@ -4,13 +4,16 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.Color
 import android.icu.text.CaseMap
+import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.provider.Contacts.SettingsColumns.KEY
 import android.util.Log
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Switch
+import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.lifecycle.ViewModel
@@ -18,8 +21,10 @@ import app.nakao.shoma.schedule.databinding.ActivityScheduleEditBinding
 import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import java.time.DayOfWeek
+import java.time.LocalDate
 import java.time.Month
 import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class scheduleEdit : AppCompatActivity() {
@@ -28,43 +33,63 @@ class scheduleEdit : AppCompatActivity() {
 
     private lateinit var binding: ActivityScheduleEditBinding
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_schedule_edit)
         binding = ActivityScheduleEditBinding.inflate(layoutInflater).apply { setContentView(this.root) }
-        val titleEdit = findViewById<EditText>(R.id.titleEdit)
-        val contentsEdit = findViewById<EditText>(R.id.contentsEdit)
-        val backButton = findViewById<Button>(R.id.backbutton)
-        val container = findViewById<ConstraintLayout>(R.id.container)
-        val repeatDaySwich = findViewById<Switch>(R.id.repeatDaySwich)
-        val repeatMonthSwich = findViewById<Switch>(R.id.repeatMonthSwich)
-        val repeatWeekSwich = findViewById<Switch>(R.id.repeatWeekSwich)
 
         val memo: Memo? = read()
 
         val intent_title = intent.getStringExtra("title")
         val intent_content = intent.getStringExtra("content")
+        val reconstruction = intent.getIntExtra("reconstruction",0)
+        val condition = intent.getStringExtra("condition")
 
         var repeat = 0
+        var leap = 0
 
         if (intent_title != null && intent_content != null){
-            titleEdit.setText(intent_title.toString())
-            contentsEdit.setText(intent_content.toString())
+            binding.titleEdit.setText(intent_title.toString())
+            binding.contentsEdit.setText(intent_content.toString())
+        }
+
+        if (reconstruction?.toInt() == 1){
+            Log.d("reconstruction",reconstruction.toString())
+            binding.repeatDaySwich.visibility = View.GONE
+            binding.repeatWeekSwich.visibility = View.GONE
+            binding.repeatMonthSwich.visibility = View.GONE
+            binding.repeatYearSwich.visibility = View.GONE
+        }else{
+            Log.d("reconstruction",reconstruction.toString())
+            binding.repeatDaySwich.visibility = View.VISIBLE
+            binding.repeatWeekSwich.visibility = View.VISIBLE
+            binding.repeatMonthSwich.visibility = View.VISIBLE
+            binding.repeatYearSwich.visibility = View.VISIBLE
         }
 
         binding.savebutton.setOnClickListener {
-            val title: String = titleEdit.text.toString()
-            val content: String = contentsEdit.text.toString()
+            val title: String = binding.titleEdit.text.toString()
+            val content: String = binding.contentsEdit.text.toString()
             var year = intent.getStringExtra("year")
             var month = intent.getStringExtra("month")
             var day = intent.getStringExtra("day")
+            val intent_day = day
+            val intent_month = month
+            val intent_year = year
+            val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/dd")
+            val intent_date = LocalDate.parse("$intent_year/$intent_month/$intent_day",
+                csvFormat)
+            var dayOfYear = intent_date.dayOfYear
+            Log.d("dayofyear",dayOfYear.toString())
             var day_int = day?.toInt()
             var month_int = month?.toInt()
+            var year_int = year?.toInt()
             val isComplete = intent.getBooleanExtra("isComplete",false)
-            var intent_condition = intent.getIntExtra("condition",1)
+            var intent_condition = intent.getIntExtra("condition",0)
 
             if (title.equals("")){
-                AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+                AlertDialog.Builder(this)
                     .setTitle("タイトルが入力されていません")
                     .setMessage("タイトルを入力してください")
                     .setPositiveButton("OK", { dialog, which ->
@@ -72,7 +97,7 @@ class scheduleEdit : AppCompatActivity() {
                     })
                     .show()
             }else if (content.equals("")){
-                AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+                AlertDialog.Builder(this)
                     .setTitle("内容が入力されていません")
                     .setMessage("内容を入力してください")
                     .setPositiveButton("OK", { dialog, which ->
@@ -81,27 +106,209 @@ class scheduleEdit : AppCompatActivity() {
                     .show()
             }else{
                 if (year != null && month != null && day != null) {
-                    if (repeatDaySwich.isChecked == false &&  repeatWeekSwich.isChecked == false && repeatMonthSwich.isChecked == false){
+                    if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false){
                         save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
-                    }else if (repeatDaySwich.isChecked == true &&  repeatWeekSwich.isChecked == false && repeatMonthSwich.isChecked == false){
+                    }else if (binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false){
                         Log.d("repeat",repeat.toString())
-                        for (i in 1..31){
+                        for (i in 1..100){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
-                            if (day_int != null){
-                                day_int++
+                            if (dayOfYear != null){
+                                dayOfYear++
                             }
+                            if (year_int != null){
+                                if (year_int % 100 == 0){
+                                    if (year_int % 400 == 0){
+                                        leap = 1
+                                    }else{
+                                        leap = 0
+                                    }
+                                }else if (year_int % 4 == 0){
+                                    leap = 1
+                                }else{
+                                    leap = 0
+                                }
+                            }
+                            if (leap == 1){
+                                if (dayOfYear >= 336){
+                                    day_int = dayOfYear-335
+                                    month_int = 12
+                                }else if (dayOfYear >= 306) {
+                                    day_int = dayOfYear - 305
+                                    month_int = 11
+                                }else if (dayOfYear >= 275) {
+                                    day_int = dayOfYear - 274
+                                    month_int = 10
+                                }else if (dayOfYear >= 245) {
+                                    day_int = dayOfYear - 244
+                                    month_int = 9
+                                }else if (dayOfYear >= 214) {
+                                    day_int = dayOfYear - 213
+                                    month_int = 8
+                                }else if (dayOfYear >= 183) {
+                                    day_int = dayOfYear - 182
+                                    month_int = 7
+                                }else if (dayOfYear >= 153) {
+                                    day_int = dayOfYear - 152
+                                    month_int = 6
+                                }else if (dayOfYear >= 122) {
+                                    day_int = dayOfYear - 121
+                                    month_int = 5
+                                }else if (dayOfYear >= 92) {
+                                    day_int = dayOfYear - 91
+                                    month_int = 4
+                                }else if (dayOfYear >= 61) {
+                                    day_int = dayOfYear - 60
+                                    month_int = 3
+                                }else if (dayOfYear >= 32) {
+                                    day_int = dayOfYear - 31
+                                    month_int = 2
+                                }else{
+                                    day_int = dayOfYear
+                                    month_int = 1
+                                }
+                            }else{
+                                if (dayOfYear >= 335){
+                                    day_int = dayOfYear-334
+                                    month_int = 12
+                                }else if (dayOfYear >= 305) {
+                                    day_int = dayOfYear - 304
+                                    month_int = 11
+                                }else if (dayOfYear >= 274) {
+                                    day_int = dayOfYear - 273
+                                    month_int = 10
+                                }else if (dayOfYear >= 244) {
+                                    day_int = dayOfYear - 243
+                                    month_int = 9
+                                }else if (dayOfYear >= 213) {
+                                    day_int = dayOfYear - 212
+                                    month_int = 8
+                                }else if (dayOfYear >= 182) {
+                                    day_int = dayOfYear - 181
+                                    month_int = 7
+                                }else if (dayOfYear >= 152) {
+                                    day_int = dayOfYear - 151
+                                    month_int = 6
+                                }else if (dayOfYear >= 121) {
+                                    day_int = dayOfYear - 120
+                                    month_int = 5
+                                }else if (dayOfYear >= 91) {
+                                    day_int = dayOfYear - 90
+                                    month_int = 4
+                                }else if (dayOfYear >= 60) {
+                                    day_int = dayOfYear - 59
+                                    month_int = 3
+                                }else if (dayOfYear >= 32) {
+                                    day_int = dayOfYear - 31
+                                    month_int = 2
+                                }else{
+                                    day_int = dayOfYear
+                                    month_int = 1
+                                }
+                            }
+                            month = month_int.toString()
                             day = day_int.toString()
                             Log.d("day",day.toString())
                         }
-                    }else if (repeatDaySwich.isChecked == false &&  repeatWeekSwich.isChecked == true && repeatMonthSwich.isChecked == false){
-                        for (i in 1..10){
+                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false){
+                        for (i in 1..12){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
-                            if (day_int != null){
-                                day_int = day_int+7
+                            if (dayOfYear != null){
+                                dayOfYear = dayOfYear + 7
                             }
+                            if (year_int != null){
+                                if (year_int % 100 == 0){
+                                    if (year_int % 400 == 0){
+                                        leap = 1
+                                    }else{
+                                        leap = 0
+                                    }
+                                }else if (year_int % 4 == 0){
+                                    leap = 1
+                                }else{
+                                    leap = 0
+                                }
+                            }
+                            if (leap == 1){
+                                if (dayOfYear >= 336){
+                                    day_int = dayOfYear-335
+                                    month_int = 12
+                                }else if (dayOfYear >= 306) {
+                                    day_int = dayOfYear - 305
+                                    month_int = 11
+                                }else if (dayOfYear >= 275) {
+                                    day_int = dayOfYear - 274
+                                    month_int = 10
+                                }else if (dayOfYear >= 245) {
+                                    day_int = dayOfYear - 244
+                                    month_int = 9
+                                }else if (dayOfYear >= 214) {
+                                    day_int = dayOfYear - 213
+                                    month_int = 8
+                                }else if (dayOfYear >= 183) {
+                                    day_int = dayOfYear - 182
+                                    month_int = 7
+                                }else if (dayOfYear >= 153) {
+                                    day_int = dayOfYear - 152
+                                    month_int = 6
+                                }else if (dayOfYear >= 122) {
+                                    day_int = dayOfYear - 121
+                                    month_int = 5
+                                }else if (dayOfYear >= 92) {
+                                    day_int = dayOfYear - 91
+                                    month_int = 4
+                                }else if (dayOfYear >= 61) {
+                                    day_int = dayOfYear - 60
+                                    month_int = 3
+                                }else if (dayOfYear >= 32) {
+                                    day_int = dayOfYear - 31
+                                    month_int = 2
+                                }else{
+                                    day_int = dayOfYear
+                                    month_int = 1
+                                }
+                            }else{
+                                if (dayOfYear >= 335){
+                                    day_int = dayOfYear-334
+                                    month_int = 12
+                                }else if (dayOfYear >= 305) {
+                                    day_int = dayOfYear - 304
+                                    month_int = 11
+                                }else if (dayOfYear >= 274) {
+                                    day_int = dayOfYear - 273
+                                    month_int = 10
+                                }else if (dayOfYear >= 244) {
+                                    day_int = dayOfYear - 243
+                                    month_int = 9
+                                }else if (dayOfYear >= 213) {
+                                    day_int = dayOfYear - 212
+                                    month_int = 8
+                                }else if (dayOfYear >= 182) {
+                                    day_int = dayOfYear - 181
+                                    month_int = 7
+                                }else if (dayOfYear >= 152) {
+                                    day_int = dayOfYear - 151
+                                    month_int = 6
+                                }else if (dayOfYear >= 121) {
+                                    day_int = dayOfYear - 120
+                                    month_int = 5
+                                }else if (dayOfYear >= 91) {
+                                    day_int = dayOfYear - 90
+                                    month_int = 4
+                                }else if (dayOfYear >= 60) {
+                                    day_int = dayOfYear - 59
+                                    month_int = 3
+                                }else if (dayOfYear >= 32) {
+                                    day_int = dayOfYear - 31
+                                    month_int = 2
+                                }else{
+                                    day_int = dayOfYear
+                                    month_int = 1
+                                }
+                            }
+                            month = month_int.toString()
                             day = day_int.toString()
                         }
-                    }else if (repeatDaySwich.isChecked == false &&  repeatWeekSwich.isChecked == false && repeatMonthSwich.isChecked == true){
+                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == true && binding.repeatYearSwich.isChecked == false){
                         for (i in 1..12){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (month_int != null){
@@ -109,13 +316,23 @@ class scheduleEdit : AppCompatActivity() {
                             }
                             month = month_int.toString()
                         }
+                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == true){
+                        for (i in 1..10){
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                            if (year_int != null){
+                                year_int++
+                            }
+                            year = year_int.toString()
+                        }
                     }
                 }
 
+                Log.d("intent_condition",intent_condition.toString())
+
                 val mainIntent = Intent(this,MainActivity::class.java).run {
-                    putExtra("year",year)
-                    putExtra("month",month)
-                    putExtra("day",day)
+                    putExtra("year",intent_year)
+                    putExtra("month",intent_month)
+                    putExtra("day",intent_day)
                     putExtra("condition",intent_condition)
                 }
                 startActivity(mainIntent)
@@ -128,8 +345,11 @@ class scheduleEdit : AppCompatActivity() {
             val day = intent.getStringExtra("day")
             val isComplete = intent.getBooleanExtra("isComplete",false)
 
-            if (year != null && month != null && day != null && intent_title != null && intent_content != null) {
-                save(year,month,day ,intent_title.toString(),intent_content.toString(),isComplete)
+            Log.d("condition",condition.toString())
+            if (condition?.toInt() == 3){
+                if (year != null && month != null && day != null && intent_title != null && intent_content != null) {
+                    save(year,month,day ,intent_title.toString(),intent_content.toString(),isComplete)
+                }
             }
 
             val mainIntent = Intent(this,MainActivity::class.java).run {
@@ -140,41 +360,28 @@ class scheduleEdit : AppCompatActivity() {
             startActivity(mainIntent)
         }
 
-        /*if (titleEdit.text == null || contentsEdit.text == null){
-            Log.d("isEnabled",titleEdit.text.toString())
-            binding.savebutton.isEnabled = false
-            binding.savebutton.setBackgroundColor(Color.rgb(125,125,125))
-        }else{
-            Log.d("isEnabled",titleEdit.text.toString())
-            binding.savebutton.isEnabled = true
-            binding.savebutton.setBackgroundColor(Color.rgb(33,150,243))
-        }*/
-
-        repeatDaySwich.setOnCheckedChangeListener { compoundButton, isChecked ->
-            Log.d("repeatDay",repeatDaySwich.isChecked.toString())
-            Log.d("repeatWeek",repeatWeekSwich.isChecked.toString())
-            Log.d("repeatMonth",repeatMonthSwich.isChecked.toString())
-            //repeat = 1
-            repeatMonthSwich.isChecked = false
-            repeatWeekSwich.isChecked = false
+        binding.repeatDaySwich.setOnClickListener {
+            binding.repeatMonthSwich.isChecked = false
+            binding.repeatWeekSwich.isChecked = false
+            binding.repeatYearSwich.isChecked = false
         }
 
-        repeatWeekSwich.setOnCheckedChangeListener { compoundButton, isChecked ->
-            Log.d("repeatDay",repeatDaySwich.isChecked.toString())
-            Log.d("repeatWeek",repeatWeekSwich.isChecked.toString())
-            Log.d("repeatMonth",repeatMonthSwich.isChecked.toString())
-            //repeat = 2
-            repeatMonthSwich.isChecked = false
-            repeatDaySwich.isChecked = false
+        binding.repeatWeekSwich.setOnClickListener {
+            binding.repeatMonthSwich.isChecked = false
+            binding.repeatDaySwich.isChecked = false
+            binding.repeatYearSwich.isChecked = false
         }
 
-        repeatMonthSwich.setOnCheckedChangeListener { compoundButton, isChecked ->
-            Log.d("repeatDay",repeatDaySwich.isChecked.toString())
-            Log.d("repeatWeek",repeatWeekSwich.isChecked.toString())
-            Log.d("repeatMonth",repeatMonthSwich.isChecked.toString())
-            //repeat = 3
-            repeatDaySwich.isChecked = false
-            repeatWeekSwich.isChecked = false
+        binding.repeatMonthSwich.setOnClickListener {
+            binding.repeatDaySwich.isChecked = false
+            binding.repeatWeekSwich.isChecked = false
+            binding.repeatYearSwich.isChecked = false
+        }
+
+        binding.repeatYearSwich.setOnClickListener {
+            binding.repeatDaySwich.isChecked = false
+            binding.repeatMonthSwich.isChecked = false
+            binding.repeatWeekSwich.isChecked = false
         }
     }
 
@@ -184,13 +391,7 @@ class scheduleEdit : AppCompatActivity() {
         val sharedPreferences = getSharedPreferences("saveId", Context.MODE_PRIVATE)
         val saveId = sharedPreferences.getInt("saveId",0)
         val id = saveId + 1
-        /*if (title != null && content != null){
-            binding.savebutton.isEnabled = false
-            binding.savebutton.setBackgroundColor(Color.rgb(125,125,125))
-        }else{
-            binding.savebutton.isEnabled = true
-            binding.savebutton.setBackgroundColor(Color.rgb(33,150,243))
-        }*/
+
         realm.executeTransaction {
             val memo: Memo = it.createObject(Memo::class.java)
 
