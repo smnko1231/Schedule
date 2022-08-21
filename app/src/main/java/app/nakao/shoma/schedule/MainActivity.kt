@@ -4,6 +4,7 @@ import android.app.NotificationChannel
 import android.app.NotificationManager
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
@@ -146,6 +147,7 @@ class MainActivity : AppCompatActivity() {
 
         Toast.makeText(this, date.toString(), Toast.LENGTH_SHORT).show()
         viewList.clear()
+        val uri = Uri.parse("android.resource://$packageName/${R.raw.notification}")
 
         for (m in memo) {
             if (m.isComplete == false) {
@@ -157,6 +159,7 @@ class MainActivity : AppCompatActivity() {
                             .setContentTitle("今日の予定")
                             .setContentText(m.title+" "+m.content)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                            .setSound(uri)
 
                         with(NotificationManagerCompat.from(this)) {
                             notify(notificationId, builder.build())
