@@ -37,8 +37,6 @@ class scheduleEdit : AppCompatActivity() {
         setContentView(R.layout.activity_schedule_edit)
         binding = ActivityScheduleEditBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
-        binding.repeatCustom.visibility = View.GONE
-
         val intent_title = intent.getStringExtra("title")
         val intent_content = intent.getStringExtra("content")
         val reconstruction = intent.getIntExtra("reconstruction",0)
@@ -74,11 +72,6 @@ class scheduleEdit : AppCompatActivity() {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.repeatSpinner.adapter = spinnerAdapter
 
-        binding.customButton.setOnClickListener {
-            binding.customButton.visibility = View.GONE
-            binding.repeatCustom.visibility = View.VISIBLE
-        }
-
         binding.savebutton.setOnClickListener {
             val title: String = binding.titleEdit.text.toString()
             val content: String = binding.contentsEdit.text.toString()
@@ -104,6 +97,8 @@ class scheduleEdit : AppCompatActivity() {
             }
             Log.d("repetition_rule",binding.customEditText.text.toString())
 
+            Log.d("repeatType",repeat.toString())
+
             if (title.equals("")){
                 AlertDialog.Builder(this)
                     .setTitle("タイトルが入力されていません")
@@ -122,9 +117,9 @@ class scheduleEdit : AppCompatActivity() {
                     .show()
             }else{
                 if (year != null && month != null && day != null) {
-                    if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false){
+                    if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "未選択"){
                         save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
-                    }else if (binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "日"){
+                    }else if ((binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "日"){
                         Log.d("repeatday",repeat.toString())
                         for (i in 1..100){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
@@ -225,7 +220,7 @@ class scheduleEdit : AppCompatActivity() {
                             day = day_int.toString()
                             Log.d("day",day.toString())
                         }
-                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "週"){
+                    }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "週"){
                         for (i in 1..12){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (dayOfYear != null){
@@ -324,7 +319,7 @@ class scheduleEdit : AppCompatActivity() {
                             month = month_int.toString()
                             day = day_int.toString()
                         }
-                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == true && binding.repeatYearSwich.isChecked == false || repeat == "月"){
+                    }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == true && binding.repeatYearSwich.isChecked == false) || repeat == "月"){
                         for (i in 1..12){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (month_int != null){
@@ -381,6 +376,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatWeekSwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
             repetition_rule = 1
+            binding.repeatSpinner.setSelection(0)
         }
 
         binding.repeatWeekSwich.setOnClickListener {
@@ -388,6 +384,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatDaySwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
             repetition_rule = 7
+            binding.repeatSpinner.setSelection(0)
         }
 
         binding.repeatMonthSwich.setOnClickListener {
@@ -395,6 +392,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatWeekSwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
             repetition_rule = 1
+            binding.repeatSpinner.setSelection(0)
         }
 
         binding.repeatYearSwich.setOnClickListener {
@@ -402,6 +400,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatMonthSwich.isChecked = false
             binding.repeatWeekSwich.isChecked = false
             repetition_rule = 1
+            binding.repeatSpinner.setSelection(0)
         }
 
         /*
@@ -423,9 +422,14 @@ class scheduleEdit : AppCompatActivity() {
             AdapterView.OnItemSelectedListener {
             override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long){
                 val spinnerParent = parent as Spinner
-                val repeatType = spinnerParent.selectedItem as String
-                repeat = repeatType
+                repeat = spinnerParent.selectedItem as String
                 Log.d("repeatType",repeat)
+                if (repeat != "未選択"){
+                    binding.repeatDaySwich.isChecked = false
+                    binding.repeatMonthSwich.isChecked = false
+                    binding.repeatWeekSwich.isChecked = false
+                    binding.repeatYearSwich.isChecked = false
+                }
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

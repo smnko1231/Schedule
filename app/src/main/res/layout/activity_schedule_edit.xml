@@ -7,19 +7,6 @@
     android:layout_height="match_parent"
     tools:context=".scheduleEdit">
 
-    <Button
-        android:id="@+id/customButton"
-        android:layout_width="0dp"
-        android:layout_height="40dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginEnd="8dp"
-        android:background="@drawable/background_rounded_corners"
-        android:text="繰り返しをカスタム"
-        app:backgroundTint="#2196F3"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
     <EditText
         android:id="@+id/titleEdit"
         android:layout_width="0dp"
