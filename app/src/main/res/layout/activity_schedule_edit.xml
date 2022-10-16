@@ -7,12 +7,25 @@
     android:layout_height="match_parent"
     tools:context=".scheduleEdit">
 
+    <Button
+        android:id="@+id/customButton"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:background="@drawable/background_rounded_corners"
+        android:text="繰り返しをカスタム"
+        app:backgroundTint="#2196F3"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <EditText
         android:id="@+id/titleEdit"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="70dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:inputType="textPersonName"
@@ -26,7 +39,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="70dp"
         android:layout_marginEnd="16dp"
         android:ems="10"
         android:inputType="textPersonName"
@@ -40,7 +53,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="70dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -95,7 +108,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="80dp"
+        android:layout_marginTop="60dp"
         android:layout_marginEnd="8dp"
         android:orientation="horizontal"
         app:layout_constraintEnd_toEndOf="parent"
@@ -119,6 +132,43 @@
             android:layout_weight="1"
             android:backgroundTint="#2196F3"
             android:text="戻る" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:id="@+id/repeatCustom"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout3">
+
+        <TextView
+            android:id="@+id/textView3"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:text="繰り返す期間:"
+            android:textAlignment="viewStart"
+            android:textSize="20sp" />
+
+        <EditText
+            android:id="@+id/customEditText"
+            android:layout_width="67dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:backgroundTint="#000000"
+            android:inputType="textPersonName" />
+
+        <Spinner
+            android:id="@+id/repeatSpinner"
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_weight="1" />
+
     </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

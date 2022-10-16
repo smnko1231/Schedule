@@ -10,9 +10,7 @@ import android.os.Bundle
 import android.provider.Contacts.SettingsColumns.KEY
 import android.util.Log
 import android.view.View
-import android.widget.Button
-import android.widget.EditText
-import android.widget.Switch
+import android.widget.*
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AlertDialog
 import androidx.constraintlayout.widget.ConstraintLayout
@@ -39,14 +37,15 @@ class scheduleEdit : AppCompatActivity() {
         setContentView(R.layout.activity_schedule_edit)
         binding = ActivityScheduleEditBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
-        val memo: Memo? = read()
+        binding.repeatCustom.visibility = View.GONE
 
         val intent_title = intent.getStringExtra("title")
         val intent_content = intent.getStringExtra("content")
         val reconstruction = intent.getIntExtra("reconstruction",0)
         val condition = intent.getStringExtra("condition")
 
-        var repeat = 0
+        var repeat = ""
+        var repetition_rule = 0
         var leap = 0
 
         if (intent_title != null && intent_content != null){
@@ -68,6 +67,11 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatYearSwich.visibility = View.VISIBLE
         }
 
+        binding.customButton.setOnClickListener {
+            binding.customButton.visibility = View.GONE
+            binding.repeatCustom.visibility = View.VISIBLE
+        }
+
         binding.savebutton.setOnClickListener {
             val title: String = binding.titleEdit.text.toString()
             val content: String = binding.contentsEdit.text.toString()
@@ -77,7 +81,7 @@ class scheduleEdit : AppCompatActivity() {
             val intent_day = day
             val intent_month = month
             val intent_year = year
-            val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/dd")
+            val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/[]d")
             val intent_date = LocalDate.parse("$intent_year/$intent_month/$intent_day",
                 csvFormat)
             var dayOfYear = intent_date.dayOfYear
@@ -108,12 +112,12 @@ class scheduleEdit : AppCompatActivity() {
                 if (year != null && month != null && day != null) {
                     if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false){
                         save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
-                    }else if (binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false){
-                        Log.d("repeat",repeat.toString())
+                    }else if (binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "日"){
+                        Log.d("repetition_rule",repetition_rule.toString())
                         for (i in 1..100){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (dayOfYear != null){
-                                dayOfYear++
+                                dayOfYear = dayOfYear + repetition_rule
                             }
                             if (year_int != null){
                                 if (year_int % 100 == 0){
@@ -209,11 +213,11 @@ class scheduleEdit : AppCompatActivity() {
                             day = day_int.toString()
                             Log.d("day",day.toString())
                         }
-                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false){
+                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "週"){
                         for (i in 1..12){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (dayOfYear != null){
-                                dayOfYear = dayOfYear + 7
+                                dayOfYear = dayOfYear + repetition_rule*7
                             }
                             if (year_int != null){
                                 if (year_int % 100 == 0){
@@ -308,11 +312,11 @@ class scheduleEdit : AppCompatActivity() {
                             month = month_int.toString()
                             day = day_int.toString()
                         }
-                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == true && binding.repeatYearSwich.isChecked == false){
+                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == true && binding.repeatYearSwich.isChecked == false || repeat == "月"){
                         for (i in 1..12){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (month_int != null){
-                                month_int++
+                                month_int = month_int + repetition_rule
                             }
                             month = month_int.toString()
                         }
@@ -364,24 +368,57 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatMonthSwich.isChecked = false
             binding.repeatWeekSwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
+            repetition_rule = 1
         }
 
         binding.repeatWeekSwich.setOnClickListener {
             binding.repeatMonthSwich.isChecked = false
             binding.repeatDaySwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
+            repetition_rule = 7
         }
 
         binding.repeatMonthSwich.setOnClickListener {
             binding.repeatDaySwich.isChecked = false
             binding.repeatWeekSwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
+            repetition_rule = 1
         }
 
         binding.repeatYearSwich.setOnClickListener {
             binding.repeatDaySwich.isChecked = false
             binding.repeatMonthSwich.isChecked = false
             binding.repeatWeekSwich.isChecked = false
+            repetition_rule = 1
+        }
+
+        Log.d("customedit",binding.customEditText.text.toString())
+        if (binding.customEditText.text.toString() != ""){
+            repetition_rule = binding.customEditText.text.toString().toInt()
+        }
+        Log.d("repetition_rule",binding.customEditText.text.toString())
+
+        val spinnerItems = arrayOf("日","週","月")
+        val spinnerAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,spinnerItems)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.repeatSpinner.adapter = spinnerAdapter
+
+        binding.repeatSpinner.onItemSelectedListener = object : AdapterView.OnItemClickListener,
+            AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView<*>?, view: View?,position: Int,id: Long){
+                val spinnerParent = parent as Spinner
+                val repeatType = spinnerParent.selectedItem as String
+                repeat = repeatType
+                Log.d("repeatType",repeat)
+            }
+
+            override fun onNothingSelected(parent: AdapterView<*>?) {
+                //
+            }
+
+            override fun onItemClick(p0: AdapterView<*>?, p1: View?, p2: Int, p3: Long) {
+                TODO("Not yet implemented")
+            }
         }
     }
 

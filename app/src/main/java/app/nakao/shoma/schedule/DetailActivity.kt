@@ -20,8 +20,6 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
-        val memo:Memo? = read()
-
         val year = intent.getStringExtra("year")
         val month = intent.getStringExtra("month")
         val day = intent.getStringExtra("day")

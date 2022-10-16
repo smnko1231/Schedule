@@ -57,14 +57,18 @@ class MainActivity : AppCompatActivity() {
         val adapter = MemoAdapter(this)
         binding.RV.layoutManager = LinearLayoutManager(this)
         binding.RV.adapter = adapter
-        val dividerItemDecoration =
-            DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
+        val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
         binding.RV.addItemDecoration(dividerItemDecoration)
 
         val dt = LocalDate.now()
         val today_year = dt.year
         val today_month = dt.monthValue
         val today_day = dt.dayOfMonth
+
+        val CHANNEL_ID = "channel_id"
+        val channel_name = "channel_name"
+        val channel_description = "channel_description "
+        var notificationId = 0
 
         val intent_year = intent.getStringExtra("year")
         val intent_month = intent.getStringExtra("month")
@@ -75,34 +79,31 @@ class MainActivity : AppCompatActivity() {
         var intent_date = dt
         val intent_condition = intent.getIntExtra("condition", 0)
         Log.d("condition", intent_condition.toString())
-        val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/dd")
+        val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/[]d")
         if (intent_day != null && intent_month != null && intent_year != null) {
             intent_date = LocalDate.parse(
                 "$intent_year/$intent_month/$intent_day",
                 csvFormat
             )
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val name = channel_name
+                val descriptionText = channel_description
+                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
+                    description = descriptionText
+                }
+                /// チャネルを登録
+                val notificationManager: NotificationManager =
+                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                notificationManager.createNotificationChannel(channel)
+            }
         }
 
         var condition = 0
 
-        val CHANNEL_ID = "channel_id"
-        val channel_name = "channel_name"
-        val channel_description = "channel_description "
-        var notificationId = 0
-
         ///APIレベルに応じてチャネルを作成
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val name = channel_name
-            val descriptionText = channel_description
-            val importance = NotificationManager.IMPORTANCE_DEFAULT
-            val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
-                description = descriptionText
-            }
-            /// チャネルを登録
-            val notificationManager: NotificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-            notificationManager.createNotificationChannel(channel)
-        }
+
 
         if (intent_condition != null) {
             if (intent_condition == 1) {

@@ -28,8 +28,6 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
 
     var isComplete:Boolean = false
 
-    val memo:Memo? = read()
-
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.activity_recycler_view_adapter,parent,false)
         return ViewHolder(view)
