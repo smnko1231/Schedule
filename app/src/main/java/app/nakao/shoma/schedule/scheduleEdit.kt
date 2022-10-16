@@ -117,11 +117,9 @@ class scheduleEdit : AppCompatActivity() {
                     .show()
             }else{
                 if (year != null && month != null && day != null) {
-                    if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "未選択"){
-                        save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
-                    }else if ((binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "日"){
+                    if ((binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "日"){
                         Log.d("repeatday",repeat.toString())
-                        for (i in 1..100){
+                        for (i in 1..100/repetition_rule){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (dayOfYear != null){
                                 dayOfYear = dayOfYear + repetition_rule
@@ -221,7 +219,7 @@ class scheduleEdit : AppCompatActivity() {
                             Log.d("day",day.toString())
                         }
                     }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "週"){
-                        for (i in 1..12){
+                        for (i in 1..12/repetition_rule){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (dayOfYear != null){
                                 dayOfYear = dayOfYear + repetition_rule*7
@@ -320,7 +318,7 @@ class scheduleEdit : AppCompatActivity() {
                             day = day_int.toString()
                         }
                     }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == true && binding.repeatYearSwich.isChecked == false) || repeat == "月"){
-                        for (i in 1..12){
+                        for (i in 1..12/repetition_rule){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (month_int != null){
                                 month_int = month_int + repetition_rule
@@ -335,6 +333,8 @@ class scheduleEdit : AppCompatActivity() {
                             }
                             year = year_int.toString()
                         }
+                    }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "未選択"){
+                        save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                     }
                 }
 
