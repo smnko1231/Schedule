@@ -48,6 +48,8 @@ class scheduleEdit : AppCompatActivity() {
         var repetition_rule = 0
         var leap = 0
 
+        binding.repeatSpinner.setSelection(0)
+
         if (intent_title != null && intent_content != null){
             binding.titleEdit.setText(intent_title.toString())
             binding.contentsEdit.setText(intent_content.toString())
@@ -66,6 +68,11 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatMonthSwich.visibility = View.VISIBLE
             binding.repeatYearSwich.visibility = View.VISIBLE
         }
+
+        val spinnerItems = arrayOf("未選択","日","週","月")
+        val spinnerAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,spinnerItems)
+        spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        binding.repeatSpinner.adapter = spinnerAdapter
 
         binding.customButton.setOnClickListener {
             binding.customButton.visibility = View.GONE
@@ -91,6 +98,11 @@ class scheduleEdit : AppCompatActivity() {
             var year_int = year?.toInt()
             val isComplete = intent.getBooleanExtra("isComplete",false)
             var intent_condition = intent.getIntExtra("condition",0)
+            Log.d("customedit",binding.customEditText.text.toString())
+            if (binding.customEditText.text.toString() != ""){
+                repetition_rule = binding.customEditText.text.toString().toInt()
+            }
+            Log.d("repetition_rule",binding.customEditText.text.toString())
 
             if (title.equals("")){
                 AlertDialog.Builder(this)
@@ -113,7 +125,7 @@ class scheduleEdit : AppCompatActivity() {
                     if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false){
                         save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                     }else if (binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "日"){
-                        Log.d("repetition_rule",repetition_rule.toString())
+                        Log.d("repeatday",repeat.toString())
                         for (i in 1..100){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
                             if (dayOfYear != null){
@@ -392,6 +404,8 @@ class scheduleEdit : AppCompatActivity() {
             repetition_rule = 1
         }
 
+        /*
+
         Log.d("customedit",binding.customEditText.text.toString())
         if (binding.customEditText.text.toString() != ""){
             repetition_rule = binding.customEditText.text.toString().toInt()
@@ -402,6 +416,8 @@ class scheduleEdit : AppCompatActivity() {
         val spinnerAdapter = ArrayAdapter(this,android.R.layout.simple_spinner_item,spinnerItems)
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.repeatSpinner.adapter = spinnerAdapter
+
+         */
 
         binding.repeatSpinner.onItemSelectedListener = object : AdapterView.OnItemClickListener,
             AdapterView.OnItemSelectedListener {
