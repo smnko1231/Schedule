@@ -154,13 +154,12 @@ class MainActivity : AppCompatActivity() {
             if (m.isComplete == false) {
                 if (m.year == Year && m.month == Month && m.day == Day) {
                     viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
-                    if (m.year == today_year.toString() && m.month == today_month.toString() && m.day == today_day.toString()){
+                    if (intent_day == null && intent_month == null && intent_year == null) {
                         var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                             .setSmallIcon(R.drawable.check_image)
                             .setContentTitle("今日の予定")
                             .setContentText(m.title+" "+m.content)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setSound(uri)
 
                         with(NotificationManagerCompat.from(this)) {
                             notify(notificationId, builder.build())
@@ -188,16 +187,18 @@ class MainActivity : AppCompatActivity() {
             for (m in memo){
                 if (m.isComplete == false){
                     if (m.year == today_year.toString() && m.month == today_month.toString() && m.day == tomorrow.toString()){
-                        var builder = NotificationCompat.Builder(this, CHANNEL_ID)
-                            .setSmallIcon(R.drawable.check_image)
-                            .setContentTitle("明日の予定")
-                            .setContentText(m.title+" "+m.content)
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                        if (intent_day == null && intent_month == null && intent_year == null) {
+                            var builder = NotificationCompat.Builder(this, CHANNEL_ID)
+                                .setSmallIcon(R.drawable.check_image)
+                                .setContentTitle("明日の予定")
+                                .setContentText(m.title+" "+m.content)
+                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
 
-                        with(NotificationManagerCompat.from(this)) {
-                            notify(notificationId, builder.build())
-                            notificationId += 1
-                            Log.d("nofitication", builder.toString())
+                            with(NotificationManagerCompat.from(this)) {
+                                notify(notificationId, builder.build())
+                                notificationId += 1
+                                Log.d("nofitication", builder.toString())
+                            }
                         }
                     }
                 }

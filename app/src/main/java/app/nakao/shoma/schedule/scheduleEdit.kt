@@ -1,5 +1,6 @@
 package app.nakao.shoma.schedule
 
+import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -18,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import app.nakao.shoma.schedule.databinding.ActivityScheduleEditBinding
 import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
+import kotlinx.coroutines.newFixedThreadPoolContext
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
@@ -30,6 +32,10 @@ class scheduleEdit : AppCompatActivity() {
     val realm:Realm = Realm.getDefaultInstance()
 
     private lateinit var binding: ActivityScheduleEditBinding
+
+    var change_day = 0
+    var change_year = 0
+    var change_month = 0
 
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -46,7 +52,15 @@ class scheduleEdit : AppCompatActivity() {
         var repetition_rule = 0
         var leap = 0
 
+        var year = intent.getStringExtra("year")
+        var month = intent.getStringExtra("month")
+        var day = intent.getStringExtra("day")
+
+        binding.dateChangeTextView.text = year+"年"+month+"月"+day+"日"
+
         binding.repeatSpinner.setSelection(0)
+
+        binding.dateChangeCalendar.visibility = View.INVISIBLE
 
         if (intent_title != null && intent_content != null){
             binding.titleEdit.setText(intent_title.toString())
@@ -73,11 +87,11 @@ class scheduleEdit : AppCompatActivity() {
         binding.repeatSpinner.adapter = spinnerAdapter
 
         binding.savebutton.setOnClickListener {
+            year = change_year.toString()
+            month = change_month.toString()
+            day = change_day.toString()
             val title: String = binding.titleEdit.text.toString()
             val content: String = binding.contentsEdit.text.toString()
-            var year = intent.getStringExtra("year")
-            var month = intent.getStringExtra("month")
-            var day = intent.getStringExtra("day")
             val intent_day = day
             val intent_month = month
             val intent_year = year
@@ -440,6 +454,10 @@ class scheduleEdit : AppCompatActivity() {
                 TODO("Not yet implemented")
             }
         }
+
+        binding.dateChangeButton.setOnClickListener {
+            showDatePickerDialog()
+        }
     }
 
     fun save(year:String,month:String, day:String, title:String,content:String,isComplete:Boolean){
@@ -472,6 +490,28 @@ class scheduleEdit : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         realm.close()
+    }
+
+    fun showDatePickerDialog() {
+        val calendar: Calendar = Calendar.getInstance()
+
+        //日付ピッカーダイアログを生成および設定
+        DatePickerDialog(
+            this,
+            //ダイアログのクリックイベント設定
+            DatePickerDialog.OnDateSetListener { _, year, monthOfYear, dayOfMonth ->
+                val currentDate =
+                    Calendar.getInstance().apply { set(year, monthOfYear, dayOfMonth) }
+                binding.dateChangeTextView.text = year.toString()+"年"+(monthOfYear+1)+"月"+dayOfMonth+"日"
+                change_year = year
+                change_month = monthOfYear+1
+                change_day = dayOfMonth
+            },
+            calendar.get(Calendar.YEAR),
+            calendar.get(Calendar.MONTH),
+            calendar.get(Calendar.DAY_OF_MONTH)
+        ).apply {
+        }.show()
     }
 }
 
