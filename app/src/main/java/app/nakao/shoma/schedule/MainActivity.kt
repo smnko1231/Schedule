@@ -18,6 +18,7 @@ import androidx.annotation.RequiresApi
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
+import androidx.core.view.ContentInfoCompat.Flags
 import androidx.core.view.get
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -61,7 +62,9 @@ class MainActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
         binding.RV.addItemDecoration(dividerItemDecoration)
 
-        var flag:Int
+        var flag:String
+        val Flag = intent.getStringExtra("flag")
+        Log.d("flag?",Flag.toString())
 
         val dt = LocalDate.now()
         val today_year = dt.year
@@ -84,10 +87,7 @@ class MainActivity : AppCompatActivity() {
         Log.d("condition", intent_condition.toString())
         val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/[]d")
         if (intent_day != null && intent_month != null && intent_year != null) {
-            intent_date = LocalDate.parse(
-                "$intent_year/$intent_month/$intent_day",
-                csvFormat
-            )
+            intent_date = LocalDate.parse("$intent_year/$intent_month/$intent_day", csvFormat)
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val name = channel_name
@@ -105,6 +105,8 @@ class MainActivity : AppCompatActivity() {
 
         var condition = 0
 
+        val tomorrow = today_day+1
+
         if (intent_year != null && intent_month != null && intent_day != null) {
             Year = intent_year
             Month = intent_month
@@ -112,7 +114,11 @@ class MainActivity : AppCompatActivity() {
         } else {
             Year = today_year.toString()
             Month = today_month.toString()
-            Day = today_day.toString()
+            if (Flag == "today" || Flag == null){
+                Day = today_day.toString()
+            }else if (Flag == "tomorrow"){
+                Day = tomorrow.toString()
+            }
         }
         Log.d("tomorrow?",Day)
 
@@ -156,13 +162,13 @@ class MainActivity : AppCompatActivity() {
                 if (m.year == Year && m.month == Month && m.day == Day) {
                     viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
                     if (intent_day == null && intent_month == null && intent_year == null) {
-                        flag = 1
+                        flag = "today"
                         var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                             .setSmallIcon(R.drawable.check_image)
                             .setContentTitle("今日の予定")
                             .setContentText(m.title+" "+m.content)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setContentIntent(PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),0))
+                            .setContentIntent(PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).run { putExtra("flag",flag) },0))
                         Year = today_year.toString()
                         Month = today_month.toString()
                         Day = today_day.toString()
@@ -182,8 +188,6 @@ class MainActivity : AppCompatActivity() {
         adapter.itemClear()
         adapter.addall(viewList)
 
-        val tomorrow = today_day+1
-
         val today_time = LocalDateTime.now()
         val hour = today_time.hour
         Log.d("hour",hour.toString())
@@ -193,22 +197,24 @@ class MainActivity : AppCompatActivity() {
                 if (m.isComplete == false){
                     if (m.year == today_year.toString() && m.month == today_month.toString() && m.day == tomorrow.toString()){
                         if (intent_day == null && intent_month == null && intent_year == null) {
-                            flag = 2
+                            flag = "tomorrow"
                             var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                                 .setSmallIcon(R.drawable.check_image)
                                 .setContentTitle("明日の予定")
                                 .setContentText(m.title+" "+m.content)
                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                .setContentIntent(PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),0))
+                                .setContentIntent(PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).run { putExtra("flag",flag) },0))
                             Year = today_year.toString()
                             Month = today_month.toString()
                             Day = tomorrow.toString()
+                            Log.d("flag",flag)
                             Log.d("tomorrow",tomorrow.toString())
                             with(NotificationManagerCompat.from(this)) {
                                 notify(notificationId, builder.build())
                                 notificationId += 1
                                 Log.d("nofitication", builder.toString())
                             }
+                            onDateChange(adapter,memo,viewList,Year.toInt(),Month.toInt(),Day.toInt())
                         }
                     }
                 }
@@ -216,30 +222,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         binding.calendarView.setOnDateChangeListener { view, year, month, dayofmonth ->
-            val month2 = month + 1
-            Year = "$year"
-            Month = "$month2"
-            Day = "$dayofmonth"
-
-            val date = "$year/$month2/$dayofmonth"
-
-            Toast.makeText(this, date, Toast.LENGTH_LONG).show()
-
-            viewList.clear()
-
-            for (m in memo) {
-                if (m.isComplete == false) {
-                    if (m.year == Year && m.month == Month && m.day == Day) {
-                        viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
-                    }
-                } else {
-                    if (m.year == Year && m.month == Month && m.day == Day) {
-                        viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
-                    }
-                }
-            }
-            adapter.itemClear()
-            adapter.addall(viewList)
+            onDateChange(adapter,memo,viewList,year.toInt(),month.toInt(),dayofmonth.toInt())
         }
 
         binding.floatingActionButton.setOnClickListener {
@@ -282,5 +265,37 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         realm.close()
+    }
+
+    fun onDateChange(adapter: MemoAdapter,
+                     memo: RealmResults<Memo>,
+                     viewList: MutableList<Memo>,
+                     year: Int,
+                     month: Int,
+                     dayofmonth: Int){
+        val month2 = month + 1
+        Year = "$year"
+        Month = "$month2"
+        Day = "$dayofmonth"
+
+        val date = "$year/$month2/$dayofmonth"
+
+        Toast.makeText(this, date, Toast.LENGTH_LONG).show()
+
+        viewList.clear()
+
+        for (m in memo) {
+            if (m.isComplete == false) {
+                if (m.year == Year && m.month == Month && m.day == Day) {
+                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
+                }
+            } else {
+                if (m.year == Year && m.month == Month && m.day == Day) {
+                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
+                }
+            }
+        }
+        adapter.itemClear()
+        adapter.addall(viewList)
     }
 }
