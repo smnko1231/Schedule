@@ -37,6 +37,10 @@ class scheduleEdit : AppCompatActivity() {
     var change_year = 0
     var change_month = 0
 
+    var yeartoadd = 0
+    var monthtoadd = 0
+    var daytoadd = 0
+
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,6 +61,10 @@ class scheduleEdit : AppCompatActivity() {
         var year = intent.getStringExtra("year")
         var month = intent.getStringExtra("month")
         var day = intent.getStringExtra("day")
+
+        yeartoadd = year!!.toInt()
+        monthtoadd = month!!.toInt()-1
+        daytoadd = day!!.toInt()
 
         binding.dateChangeTextView.text = year+"年"+month+"月"+day+"日"
 
@@ -497,6 +505,7 @@ class scheduleEdit : AppCompatActivity() {
     fun showDatePickerDialog() {
         val calendar: Calendar = Calendar.getInstance()
 
+        calendar.set(yeartoadd,monthtoadd,daytoadd)
         //日付ピッカーダイアログを生成および設定
         DatePickerDialog(
             this,

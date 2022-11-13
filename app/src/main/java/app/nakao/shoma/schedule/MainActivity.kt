@@ -62,8 +62,6 @@ class MainActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
         binding.RV.addItemDecoration(dividerItemDecoration)
 
-        var flag:String
-        var flag2:String
         val Flag = intent.getStringExtra("flag")
         Log.d("flag?",Flag.toString())
 
@@ -134,6 +132,20 @@ class MainActivity : AppCompatActivity() {
 
         val date = "$Year/$Month/$Day"
 
+        binding.floatingActionButton.setOnClickListener {
+            val scheduleEdit = Intent(this, scheduleEdit::class.java).run {
+                condition = 1
+                putExtra("year", Year)
+                putExtra("month", Month)
+                putExtra("day", Day)
+                putExtra("isComplete", IsComplete)
+                putExtra("dayOfYear", dayOfYear)
+                putExtra("reconstruction", 0)
+                putExtra("condition", condition)
+            }
+            startActivity(scheduleEdit)
+        }
+
         if (intent_condition != null) {
             if (intent_condition == 1) {
                 Snackbar.make(binding.container, "保存しました!", Snackbar.LENGTH_SHORT).show()
@@ -168,9 +180,9 @@ class MainActivity : AppCompatActivity() {
                 if (m.year == Year && m.month == Month && m.day == Day) {
                     viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
                     if (intent_day == null && intent_month == null && intent_year == null) {
-                        flag = "today"
+                        val flag = "today"
 
-                        val notificationIntent = Intent(this,MainActivity::class.java)
+                        val notificationIntent = Intent(this,notifyActivity::class.java)
                         notificationIntent.putExtra("flag",flag)
 
                         var builder = NotificationCompat.Builder(this, CHANNEL_ID)
@@ -178,14 +190,14 @@ class MainActivity : AppCompatActivity() {
                             .setContentTitle("今日の予定")
                             .setContentText(m.title+" "+m.content)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setContentIntent(PendingIntent.getActivity(this,0,notificationIntent,0))
-                        Year = today_year.toString()
+                            .setContentIntent(PendingIntent.getActivity(this,0,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT))
+                        /*Year = today_year.toString()
                         Month = today_month.toString()
-                        Day = today_day.toString()
+                        Day = today_day.toString()*/
                         with(NotificationManagerCompat.from(this)) {
                             notify(notificationId, builder.build())
                             notificationId += 1
-                            Log.d("flag",flag)
+                            //Log.d("flag",flag)
                             Log.d("nofitication", builder.toString())
                         }
                     }
@@ -208,26 +220,24 @@ class MainActivity : AppCompatActivity() {
                 if (m.isComplete == false){
                     if (m.year == today_year.toString() && m.month == today_month.toString() && m.day == tomorrow.toString()){
                         if (intent_day == null && intent_month == null && intent_year == null) {
-                            flag2 = "tomorrow"
-
-                            flag = "tomorrow"
-                            val notificationIntent = Intent(this,MainActivity::class.java)
+                            val flag = "tomorrow"
+                            val notificationIntent = Intent(this,notifyActivity::class.java)
                             notificationIntent.putExtra("flag",flag)
-                            
+
                             var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                                 .setSmallIcon(R.drawable.check_image)
                                 .setContentTitle("明日の予定")
                                 .setContentText(m.title+" "+m.content)
                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                .setContentIntent(PendingIntent.getActivity(this,0,notificationIntent,0))
-                            Year = today_year.toString()
+                                .setContentIntent(PendingIntent.getActivity(this,0,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT))
+                            /*Year = today_year.toString()
                             Month = today_month.toString()
-                            Day = tomorrow.toString()
+                            Day = tomorrow.toString()*/
                             Log.d("tomorrow",tomorrow.toString())
                             with(NotificationManagerCompat.from(this)) {
                                 notify(notificationId, builder.build())
                                 notificationId += 1
-                                Log.d("flag",flag2)
+                                //Log.d("flag",flag2)
                                 Log.d("nofitication", builder.toString())
                             }
                             /*if (intent_year != null && intent_month != null && intent_day != null){
@@ -241,20 +251,6 @@ class MainActivity : AppCompatActivity() {
 
         binding.calendarView.setOnDateChangeListener { view, year, month, dayofmonth ->
             onDateChange(adapter,memo,viewList,year.toInt(),month.toInt(),dayofmonth.toInt())
-        }
-
-        binding.floatingActionButton.setOnClickListener {
-            val scheduleEdit = Intent(this, scheduleEdit::class.java).run {
-                condition = 1
-                putExtra("year", Year)
-                putExtra("month", Month)
-                putExtra("day", Day)
-                putExtra("isComplete", IsComplete)
-                putExtra("dayOfYear", dayOfYear)
-                putExtra("reconstruction", 0)
-                putExtra("condition", condition)
-            }
-            startActivity(scheduleEdit)
         }
 
         binding.returnTodayButton.setOnClickListener {

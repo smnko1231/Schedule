@@ -11,11 +11,18 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Schedule">
         <activity
+            android:name=".notifyActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".DetailActivity"
             android:exported="false" />
         <activity
             android:name=".editActivity"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".scheduleEdit"
             android:exported="false" />
