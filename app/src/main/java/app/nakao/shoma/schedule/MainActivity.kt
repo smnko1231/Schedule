@@ -2,6 +2,7 @@ package app.nakao.shoma.schedule
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
@@ -60,6 +61,8 @@ class MainActivity : AppCompatActivity() {
         val dividerItemDecoration = DividerItemDecoration(this, LinearLayoutManager(this).getOrientation())
         binding.RV.addItemDecoration(dividerItemDecoration)
 
+        var flag:Int
+
         val dt = LocalDate.now()
         val today_year = dt.year
         val today_month = dt.monthValue
@@ -95,15 +98,29 @@ class MainActivity : AppCompatActivity() {
                 }
                 /// チャネルを登録
                 val notificationManager: NotificationManager =
-                    getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+                    getSystemService(NOTIFICATION_SERVICE) as NotificationManager
                 notificationManager.createNotificationChannel(channel)
             }
         }
 
         var condition = 0
 
-        ///APIレベルに応じてチャネルを作成
+        if (intent_year != null && intent_month != null && intent_day != null) {
+            Year = intent_year
+            Month = intent_month
+            Day = intent_day
+        } else {
+            Year = today_year.toString()
+            Month = today_month.toString()
+            Day = today_day.toString()
+        }
+        Log.d("tomorrow?",Day)
 
+        val zoneId = ZoneId.systemDefault()
+        val millis = intent_date.atStartOfDay(zoneId).toEpochSecond() * 1000
+        binding.calendarView.date = millis
+
+        val date = "$Year/$Month/$Day"
 
         if (intent_condition != null) {
             if (intent_condition == 1) {
@@ -130,22 +147,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        if (intent_year != null && intent_month != null && intent_day != null) {
-            Year = intent_year
-            Month = intent_month
-            Day = intent_day
-        } else {
-            Year = today_year.toString()
-            Month = today_month.toString()
-            Day = today_day.toString()
-        }
-
-        val zoneId = ZoneId.systemDefault()
-        val millis = intent_date.atStartOfDay(zoneId).toEpochSecond() * 1000
-        binding.calendarView.date = millis
-
-        val date = "$Year/$Month/$Day"
-
         Toast.makeText(this, date.toString(), Toast.LENGTH_SHORT).show()
         viewList.clear()
         val uri = Uri.parse("android.resource://$packageName/${R.raw.notification}")
@@ -155,12 +156,16 @@ class MainActivity : AppCompatActivity() {
                 if (m.year == Year && m.month == Month && m.day == Day) {
                     viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
                     if (intent_day == null && intent_month == null && intent_year == null) {
+                        flag = 1
                         var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                             .setSmallIcon(R.drawable.check_image)
                             .setContentTitle("今日の予定")
                             .setContentText(m.title+" "+m.content)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
+                            .setContentIntent(PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),0))
+                        Year = today_year.toString()
+                        Month = today_month.toString()
+                        Day = today_day.toString()
                         with(NotificationManagerCompat.from(this)) {
                             notify(notificationId, builder.build())
                             notificationId += 1
@@ -183,17 +188,22 @@ class MainActivity : AppCompatActivity() {
         val hour = today_time.hour
         Log.d("hour",hour.toString())
 
-        if (hour > 20){
+        if (hour > 9){
             for (m in memo){
                 if (m.isComplete == false){
                     if (m.year == today_year.toString() && m.month == today_month.toString() && m.day == tomorrow.toString()){
                         if (intent_day == null && intent_month == null && intent_year == null) {
+                            flag = 2
                             var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                                 .setSmallIcon(R.drawable.check_image)
                                 .setContentTitle("明日の予定")
                                 .setContentText(m.title+" "+m.content)
                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-
+                                .setContentIntent(PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java),0))
+                            Year = today_year.toString()
+                            Month = today_month.toString()
+                            Day = tomorrow.toString()
+                            Log.d("tomorrow",tomorrow.toString())
                             with(NotificationManagerCompat.from(this)) {
                                 notify(notificationId, builder.build())
                                 notificationId += 1

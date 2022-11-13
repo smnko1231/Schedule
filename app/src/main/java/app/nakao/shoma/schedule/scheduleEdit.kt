@@ -60,8 +60,6 @@ class scheduleEdit : AppCompatActivity() {
 
         binding.repeatSpinner.setSelection(0)
 
-        binding.dateChangeCalendar.visibility = View.INVISIBLE
-
         if (intent_title != null && intent_content != null){
             binding.titleEdit.setText(intent_title.toString())
             binding.contentsEdit.setText(intent_content.toString())
@@ -87,9 +85,11 @@ class scheduleEdit : AppCompatActivity() {
         binding.repeatSpinner.adapter = spinnerAdapter
 
         binding.savebutton.setOnClickListener {
-            year = change_year.toString()
-            month = change_month.toString()
-            day = change_day.toString()
+            if (change_year != 0){
+                year = change_year.toString()
+                month = change_month.toString()
+                day = change_day.toString()
+            }
             val title: String = binding.titleEdit.text.toString()
             val content: String = binding.contentsEdit.text.toString()
             val intent_day = day
