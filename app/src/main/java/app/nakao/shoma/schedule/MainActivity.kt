@@ -63,13 +63,19 @@ class MainActivity : AppCompatActivity() {
         binding.RV.addItemDecoration(dividerItemDecoration)
 
         var flag:String
+        var flag2:String
         val Flag = intent.getStringExtra("flag")
         Log.d("flag?",Flag.toString())
 
         val dt = LocalDate.now()
         val today_year = dt.year
         val today_month = dt.monthValue
-        val today_day = dt.dayOfMonth
+        var today_day = 0
+        if (Flag == "today" || Flag == null){
+            today_day = dt.dayOfMonth
+        }else if (Flag == "tomorrow"){
+            today_day = dt.dayOfMonth+1
+        }
 
         val CHANNEL_ID = "channel_id"
         val channel_name = "channel_name"
@@ -163,18 +169,23 @@ class MainActivity : AppCompatActivity() {
                     viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
                     if (intent_day == null && intent_month == null && intent_year == null) {
                         flag = "today"
+
+                        val notificationIntent = Intent(this,MainActivity::class.java)
+                        notificationIntent.putExtra("flag",flag)
+
                         var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                             .setSmallIcon(R.drawable.check_image)
                             .setContentTitle("今日の予定")
                             .setContentText(m.title+" "+m.content)
                             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setContentIntent(PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).run { putExtra("flag",flag) },0))
+                            .setContentIntent(PendingIntent.getActivity(this,0,notificationIntent,0))
                         Year = today_year.toString()
                         Month = today_month.toString()
                         Day = today_day.toString()
                         with(NotificationManagerCompat.from(this)) {
                             notify(notificationId, builder.build())
                             notificationId += 1
+                            Log.d("flag",flag)
                             Log.d("nofitication", builder.toString())
                         }
                     }
@@ -197,24 +208,31 @@ class MainActivity : AppCompatActivity() {
                 if (m.isComplete == false){
                     if (m.year == today_year.toString() && m.month == today_month.toString() && m.day == tomorrow.toString()){
                         if (intent_day == null && intent_month == null && intent_year == null) {
+                            flag2 = "tomorrow"
+
                             flag = "tomorrow"
+                            val notificationIntent = Intent(this,MainActivity::class.java)
+                            notificationIntent.putExtra("flag",flag)
+                            
                             var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                                 .setSmallIcon(R.drawable.check_image)
                                 .setContentTitle("明日の予定")
                                 .setContentText(m.title+" "+m.content)
                                 .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                .setContentIntent(PendingIntent.getActivity(this,0,Intent(this,MainActivity::class.java).run { putExtra("flag",flag) },0))
+                                .setContentIntent(PendingIntent.getActivity(this,0,notificationIntent,0))
                             Year = today_year.toString()
                             Month = today_month.toString()
                             Day = tomorrow.toString()
-                            Log.d("flag",flag)
                             Log.d("tomorrow",tomorrow.toString())
                             with(NotificationManagerCompat.from(this)) {
                                 notify(notificationId, builder.build())
                                 notificationId += 1
+                                Log.d("flag",flag2)
                                 Log.d("nofitication", builder.toString())
                             }
-                            onDateChange(adapter,memo,viewList,Year.toInt(),Month.toInt(),Day.toInt())
+                            /*if (intent_year != null && intent_month != null && intent_day != null){
+                                onDateChange(adapter,memo,viewList,intent_year.toInt(),intent_month.toInt(),intent_day.toInt())
+                            }*/
                         }
                     }
                 }

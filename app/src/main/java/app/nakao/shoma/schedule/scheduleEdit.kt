@@ -48,6 +48,8 @@ class scheduleEdit : AppCompatActivity() {
         val reconstruction = intent.getIntExtra("reconstruction",0)
         val condition = intent.getStringExtra("condition")
 
+        binding.titleEdit.setText(intent.getStringExtra("flag"))
+
         var repeat = ""
         var repetition_rule = 0
         var leap = 0
