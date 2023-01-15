@@ -83,7 +83,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
             updateRealm(item.id,isComplete)
         }
         holder.container.setOnClickListener {
-            Log.e("repetitionRule",item.repetitionRule.toString())
+            Log.i("repetitionRule",item.repetitionRule.toString())
             Log.d("repeatWay",item.repeatWay)
             Log.d("schedule_day",item.day)
             Log.d("item_id",item.id.toString())

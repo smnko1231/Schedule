@@ -57,25 +57,9 @@ class DetailActivity : AppCompatActivity() {
                     val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day).findAll()
                     val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month).findAll()
                     val task_delete = task_delete_tmp4.where().equalTo("year",year).findAll()
-
-                    realm.executeTransaction{
-                        task_delete.deleteFromRealm(0)
-                        val mainIntent = Intent(this,MainActivity::class.java).run {
-                            condition = 2
-                            putExtra("year",year)
-                            putExtra("month",month)
-                            putExtra("day",day)
-                            putExtra("title",title)
-                            putExtra("content",content)
-                            putExtra("isComplete",isComplete)
-                            putExtra("condition",condition)
-                        }
-                        startActivity(mainIntent)
-                    }
-
                     //Log.v("repetitionRule",repetitionRule.toString())
                     //Log.v("repeatWay",repeatWay.toString())
-                    /*if (repetitionRule != null && repeatWay != null){
+                    if (repetitionRule != null && repeatWay != null){
                         AlertDialog.Builder(this)
                             .setTitle("繰り返すタスクを削除しますか？")
                             .setPositiveButton("はい",{dialog,which ->
@@ -126,7 +110,7 @@ class DetailActivity : AppCompatActivity() {
                             }
                             startActivity(mainIntent)
                         }
-                    }*/
+                    }
                 })
                 .setNegativeButton("いいえ", { dialog, which ->
 

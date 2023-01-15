@@ -97,6 +97,47 @@ class scheduleEdit : AppCompatActivity() {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         binding.repeatSpinner.adapter = spinnerAdapter
 
+        binding.repeatDaySwich.setOnClickListener {
+            binding.repeatMonthSwich.isChecked = false
+            binding.repeatWeekSwich.isChecked = false
+            binding.repeatYearSwich.isChecked = false
+            repetition_rule = 1
+            binding.repeatSpinner.setSelection(0)
+            Log.d("repetition_rule",repetition_rule.toString())
+        }
+
+        binding.repeatWeekSwich.setOnClickListener {
+            binding.repeatMonthSwich.isChecked = false
+            binding.repeatDaySwich.isChecked = false
+            binding.repeatYearSwich.isChecked = false
+            repetition_rule = 1
+            binding.repeatSpinner.setSelection(0)
+            Log.d("repetition_rule",repetition_rule.toString())
+        }
+
+        binding.repeatMonthSwich.setOnClickListener {
+            binding.repeatDaySwich.isChecked = false
+            binding.repeatWeekSwich.isChecked = false
+            binding.repeatYearSwich.isChecked = false
+            repetition_rule = 1
+            binding.repeatSpinner.setSelection(0)
+            Log.d("repetition_rule",repetition_rule.toString())
+        }
+
+        binding.repeatYearSwich.setOnClickListener {
+            binding.repeatDaySwich.isChecked = false
+            binding.repeatMonthSwich.isChecked = false
+            binding.repeatWeekSwich.isChecked = false
+            repetition_rule = 1
+            binding.repeatSpinner.setSelection(0)
+            Log.d("repetition_rule",repetition_rule.toString())
+        }
+
+        if (binding.customEditText.text.toString() != ""){
+            repetition_rule = binding.customEditText.text.toString().toInt()
+            Log.d("repetition_rule",repetition_rule.toString())
+        }
+
         binding.savebutton.setOnClickListener {
             if (change_year != 0){
                 year = change_year.toString()
@@ -120,46 +161,6 @@ class scheduleEdit : AppCompatActivity() {
             Log.d("customedit",binding.customEditText.text.toString())
 
             val a = 0
-
-            binding.repeatDaySwich.setOnClickListener {
-                binding.repeatMonthSwich.isChecked = false
-                binding.repeatWeekSwich.isChecked = false
-                binding.repeatYearSwich.isChecked = false
-                repetition_rule = 1
-                binding.repeatSpinner.setSelection(0)
-            }
-
-            binding.repeatWeekSwich.setOnClickListener {
-                binding.repeatMonthSwich.isChecked = false
-                binding.repeatDaySwich.isChecked = false
-                binding.repeatYearSwich.isChecked = false
-                repetition_rule = 1
-                binding.repeatSpinner.setSelection(0)
-            }
-
-            binding.repeatMonthSwich.setOnClickListener {
-                binding.repeatDaySwich.isChecked = false
-                binding.repeatWeekSwich.isChecked = false
-                binding.repeatYearSwich.isChecked = false
-                repetition_rule = 1
-                binding.repeatSpinner.setSelection(0)
-            }
-
-            binding.repeatYearSwich.setOnClickListener {
-                binding.repeatDaySwich.isChecked = false
-                binding.repeatMonthSwich.isChecked = false
-                binding.repeatWeekSwich.isChecked = false
-                repetition_rule = 1
-                binding.repeatSpinner.setSelection(0)
-            }
-
-            Log.d("repetition_rule",binding.customEditText.text.toString())
-
-            if (binding.customEditText.text.toString() != ""){
-                repetition_rule = binding.customEditText.text.toString().toInt()
-            }
-
-            Log.d("repeatType",repeat.toString())
 
             if (title.equals("")){
                 AlertDialog.Builder(this)
