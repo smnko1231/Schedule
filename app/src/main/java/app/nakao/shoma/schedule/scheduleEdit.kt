@@ -102,6 +102,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatWeekSwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
             repetition_rule = 1
+            repeatWay = "日"
             binding.repeatSpinner.setSelection(0)
             Log.d("repetition_rule",repetition_rule.toString())
         }
@@ -111,6 +112,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatDaySwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
             repetition_rule = 1
+            repeatWay = "週"
             binding.repeatSpinner.setSelection(0)
             Log.d("repetition_rule",repetition_rule.toString())
         }
@@ -120,6 +122,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatWeekSwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
             repetition_rule = 1
+            repeatWay = "月"
             binding.repeatSpinner.setSelection(0)
             Log.d("repetition_rule",repetition_rule.toString())
         }
@@ -129,12 +132,14 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatMonthSwich.isChecked = false
             binding.repeatWeekSwich.isChecked = false
             repetition_rule = 1
+            repeatWay = "年"
             binding.repeatSpinner.setSelection(0)
             Log.d("repetition_rule",repetition_rule.toString())
         }
 
         if (binding.customEditText.text.toString() != ""){
             repetition_rule = binding.customEditText.text.toString().toInt()
+            repeatWay = binding.repeatSpinner.toString()
             Log.d("repetition_rule",repetition_rule.toString())
         }
 
@@ -180,7 +185,6 @@ class scheduleEdit : AppCompatActivity() {
                     .show()
             }else{
                 if (year != null && month != null && day != null) {
-                    repeatWay = binding.repeatSpinner.toString()
                     if ((binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "日"){
                         Log.v("repetitionRule",repetition_rule.toString())
                         for (i in 1..100/repetition_rule){
