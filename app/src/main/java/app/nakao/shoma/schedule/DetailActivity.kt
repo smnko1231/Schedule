@@ -73,8 +73,8 @@ class DetailActivity : AppCompatActivity() {
                         startActivity(mainIntent)
                     }
 
-                    Log.v("repetitionRule",repetitionRule.toString())
-                    Log.v("repeatWay",repeatWay.toString())
+                    //Log.v("repetitionRule",repetitionRule.toString())
+                    //Log.v("repeatWay",repeatWay.toString())
                     /*if (repetitionRule != null && repeatWay != null){
                         AlertDialog.Builder(this)
                             .setTitle("繰り返すタスクを削除しますか？")

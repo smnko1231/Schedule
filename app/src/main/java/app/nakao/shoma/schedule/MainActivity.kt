@@ -189,7 +189,7 @@ class MainActivity : AppCompatActivity() {
         for (m in memo) {
             if (m.isComplete == false) {
                 if (m.year == Year && m.month == Month && m.day == Day) {
-                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
+                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete, m.repetitionRule, m.repeatWay))
                     if (intent_day == null && intent_month == null && intent_year == null && Flag != "tomorrow") {
                         val flag = "today"
 
@@ -218,7 +218,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 if (m.year == Year && m.month == Month && m.day == Day) {
-                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
+                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete, m.repetitionRule, m.repeatWay))
                 }
             }
         }
@@ -281,7 +281,7 @@ class MainActivity : AppCompatActivity() {
             viewList.clear()
             for (m in memo) {
                 if (m.year == today_year.toString() && m.month == today_month.toString() && m.day == today_day.toString()) {
-                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
+                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete, m.repetitionRule, m.repeatWay))
                 }
             }
             adapter.itemClear()
@@ -342,11 +342,11 @@ class MainActivity : AppCompatActivity() {
         for (m in memo) {
             if (m.isComplete == false) {
                 if (m.year == Year && m.month == Month && m.day == Day) {
-                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
+                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete, m.repetitionRule, m.repeatWay))
                 }
             } else {
                 if (m.year == Year && m.month == Month && m.day == Day) {
-                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
+                    viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete, m.repetitionRule, m.repeatWay))
                 }
             }
         }

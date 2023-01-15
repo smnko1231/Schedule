@@ -83,9 +83,10 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
             updateRealm(item.id,isComplete)
         }
         holder.container.setOnClickListener {
-            Log.d("repetitionRule",item.repetitionRule.toString())
+            Log.e("repetitionRule",item.repetitionRule.toString())
             Log.d("repeatWay",item.repeatWay)
             Log.d("schedule_day",item.day)
+            Log.d("item_id",item.id.toString())
             val detailIntent = Intent(context,DetailActivity::class.java).run {
                 putExtra("year",item.year)
                 putExtra("month",item.month)

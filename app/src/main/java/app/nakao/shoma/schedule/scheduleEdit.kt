@@ -82,12 +82,14 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatWeekSwich.visibility = View.GONE
             binding.repeatMonthSwich.visibility = View.GONE
             binding.repeatYearSwich.visibility = View.GONE
+            binding.repeatCustom.visibility = View.GONE
         }else{
             Log.d("reconstruction",reconstruction.toString())
             binding.repeatDaySwich.visibility = View.VISIBLE
             binding.repeatWeekSwich.visibility = View.VISIBLE
             binding.repeatMonthSwich.visibility = View.VISIBLE
             binding.repeatYearSwich.visibility = View.VISIBLE
+            binding.repeatCustom.visibility = View.VISIBLE
         }
 
         val spinnerItems = arrayOf("未選択","日","週","月")
@@ -119,6 +121,40 @@ class scheduleEdit : AppCompatActivity() {
 
             val a = 0
 
+            binding.repeatDaySwich.setOnClickListener {
+                binding.repeatMonthSwich.isChecked = false
+                binding.repeatWeekSwich.isChecked = false
+                binding.repeatYearSwich.isChecked = false
+                repetition_rule = 1
+                binding.repeatSpinner.setSelection(0)
+            }
+
+            binding.repeatWeekSwich.setOnClickListener {
+                binding.repeatMonthSwich.isChecked = false
+                binding.repeatDaySwich.isChecked = false
+                binding.repeatYearSwich.isChecked = false
+                repetition_rule = 1
+                binding.repeatSpinner.setSelection(0)
+            }
+
+            binding.repeatMonthSwich.setOnClickListener {
+                binding.repeatDaySwich.isChecked = false
+                binding.repeatWeekSwich.isChecked = false
+                binding.repeatYearSwich.isChecked = false
+                repetition_rule = 1
+                binding.repeatSpinner.setSelection(0)
+            }
+
+            binding.repeatYearSwich.setOnClickListener {
+                binding.repeatDaySwich.isChecked = false
+                binding.repeatMonthSwich.isChecked = false
+                binding.repeatWeekSwich.isChecked = false
+                repetition_rule = 1
+                binding.repeatSpinner.setSelection(0)
+            }
+
+            Log.d("repetition_rule",binding.customEditText.text.toString())
+
             if (binding.customEditText.text.toString() != ""){
                 repetition_rule = binding.customEditText.text.toString().toInt()
             }
@@ -145,8 +181,8 @@ class scheduleEdit : AppCompatActivity() {
                 if (year != null && month != null && day != null) {
                     repeatWay = binding.repeatSpinner.toString()
                     if ((binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "日"){
+                        Log.v("repetitionRule",repetition_rule.toString())
                         for (i in 1..100/repetition_rule){
-                            Log.v("repetitionRule",repetition_rule.toString())
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
                             if (dayOfYear != null){
                                 dayOfYear = dayOfYear + repetition_rule
@@ -398,41 +434,6 @@ class scheduleEdit : AppCompatActivity() {
             }
             startActivity(mainIntent)
         }
-
-        binding.repeatDaySwich.setOnClickListener {
-            binding.repeatMonthSwich.isChecked = false
-            binding.repeatWeekSwich.isChecked = false
-            binding.repeatYearSwich.isChecked = false
-            repetition_rule = 1
-            binding.repeatSpinner.setSelection(0)
-        }
-
-        binding.repeatWeekSwich.setOnClickListener {
-            binding.repeatMonthSwich.isChecked = false
-            binding.repeatDaySwich.isChecked = false
-            binding.repeatYearSwich.isChecked = false
-            repetition_rule = 1
-            binding.repeatSpinner.setSelection(0)
-        }
-
-        binding.repeatMonthSwich.setOnClickListener {
-            binding.repeatDaySwich.isChecked = false
-            binding.repeatWeekSwich.isChecked = false
-            binding.repeatYearSwich.isChecked = false
-            repetition_rule = 1
-            binding.repeatSpinner.setSelection(0)
-        }
-
-        binding.repeatYearSwich.setOnClickListener {
-            binding.repeatDaySwich.isChecked = false
-            binding.repeatMonthSwich.isChecked = false
-            binding.repeatWeekSwich.isChecked = false
-            repetition_rule = 1
-            binding.repeatSpinner.setSelection(0)
-        }
-
-        Log.d("repetition_rule",binding.customEditText.text.toString())
-
         /*
 
         Log.d("customedit",binding.customEditText.text.toString())
@@ -483,8 +484,8 @@ class scheduleEdit : AppCompatActivity() {
         val saveId = sharedPreferences.getInt("saveId",0)
         val id = saveId + 1
 
-        realm.executeTransaction {
-            val memo: Memo = it.createObject(Memo::class.java)
+        realm.executeTransaction { realm ->
+            val memo: Memo = realm.createObject(Memo::class.java)
 
             memo.id = id
             memo.year = year
@@ -497,6 +498,7 @@ class scheduleEdit : AppCompatActivity() {
             memo.repeatWay = repeatWay
 
             Log.d("repetitionRule",memo.repetitionRule.toString())
+            Log.v("item_id",memo.id.toString())
         }
         sharedPreferences.edit().putInt("saveId",id).apply()
     }
