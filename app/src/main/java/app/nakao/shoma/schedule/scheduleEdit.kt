@@ -137,12 +137,6 @@ class scheduleEdit : AppCompatActivity() {
             Log.d("repetition_rule",repetition_rule.toString())
         }
 
-        if (binding.customEditText.text.toString() != ""){
-            repetition_rule = binding.customEditText.text.toString().toInt()
-            repeatWay = binding.repeatSpinner.toString()
-            Log.d("repetition_rule",repetition_rule.toString())
-        }
-
         binding.savebutton.setOnClickListener {
             if (change_year != 0){
                 year = change_year.toString()
@@ -157,13 +151,18 @@ class scheduleEdit : AppCompatActivity() {
             val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/[]d")
             val intent_date = LocalDate.parse("$intent_year/$intent_month/$intent_day", csvFormat)
             var dayOfYear = intent_date.dayOfYear
-            Log.d("dayofyear",dayOfYear.toString())
             var day_int = day?.toInt()
             var month_int = month?.toInt()
             var year_int = year?.toInt()
             val isComplete = intent.getBooleanExtra("isComplete",false)
             var intent_condition = intent.getIntExtra("condition",0)
             Log.d("customedit",binding.customEditText.text.toString())
+
+            if (binding.customEditText.text.toString() != ""){
+                repetition_rule = binding.customEditText.text.toString().toInt()
+                repeatWay = binding.repeatSpinner.toString()
+                Log.d("repetition_rule",repetition_rule.toString())
+            }
 
             val a = 0
 

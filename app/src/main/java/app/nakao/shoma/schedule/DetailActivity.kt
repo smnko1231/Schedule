@@ -1,5 +1,6 @@
 package app.nakao.shoma.schedule
 
+import android.annotation.SuppressLint
 import android.content.Intent
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -23,6 +24,7 @@ class DetailActivity : AppCompatActivity() {
     val realm: Realm = Realm.getDefaultInstance()
     private lateinit var binding: ActivityDetailBinding
 
+    @SuppressLint("SuspiciousIndentation")
     @RequiresApi(Build.VERSION_CODES.O)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,18 +52,22 @@ class DetailActivity : AppCompatActivity() {
         binding.contentTextView.text = intent.getStringExtra("content")
 
         binding.deleteButton.setOnClickListener {
-            AlertDialog.Builder(this) // FragmentではActivityを取得して生成
+            val firstBuilder = AlertDialog.Builder(this)
+                firstBuilder// FragmentではActivityを取得して生成
                 .setTitle("タイトル:"+binding.titleTextView.text+"\n"+"内容:"+binding.contentTextView.text)
                 .setMessage("削除しますか?")
                 .setPositiveButton("はい", { dialog, which ->
-                    Log.v("repetitionRule",repetitionRule.toString())
+                    Log.v("repetitionRule",(100/repetitionRule).toString())
                     if (repetitionRule != 0){
-                        AlertDialog.Builder(this)
+                        val secondBuilder = AlertDialog.Builder(this)
+                            secondBuilder
                             .setTitle("繰り返すタスクを削除しますか？")
                             .setPositiveButton("はい",{dialog,which ->
                                 realm.executeTransaction{
                                     if (repeatWay == "日"){
                                         for (i in 0..100/repetitionRule){
+                                            Log.d("dayofyear",dayOfYear.toString())
+                                            Log.d("dayofmonth",day.toString())
                                             if (dayOfYear != null){
                                                 if (dayOfYear!! >= 336){
                                                     day = (dayOfYear!!-335).toString()
@@ -147,6 +153,7 @@ class DetailActivity : AppCompatActivity() {
                                     startActivity(mainIntent)
                                 }
                             })
+                                .show()
                     }else{
                         realm.executeTransaction{
                             val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
