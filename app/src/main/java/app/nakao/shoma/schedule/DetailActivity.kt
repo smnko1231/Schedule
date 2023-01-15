@@ -28,17 +28,16 @@ class DetailActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityDetailBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
-        var year = intent.getIntExtra("year",2023)
-        var month = intent.getIntExtra("month",1)
-        var day = intent.getIntExtra("day",15)
+        var year = intent.getStringExtra("year")
+        var month = intent.getStringExtra("month")
+        var day = intent.getStringExtra("day")
         val title = intent.getStringExtra("title")
         val content = intent.getStringExtra("content")
         val isComplete = intent.getBooleanExtra("isComplete",false)
         val repetitionRule = intent.getIntExtra("repetitionRule",0)
         val repeatWay = intent.getStringExtra("repeatWay")
-        Log.d("title",title.toString())
-        val date = LocalDate.of(year,month,day)
-        var dayOfYear = date?.dayOfYear?.toInt()
+        val date = LocalDate.of(year!!.toInt(),month!!.toInt(),day!!.toInt())
+        var dayOfYear = date?.dayOfYear
         var condition = 0
 
         val dt = LocalDate.now()
@@ -46,7 +45,7 @@ class DetailActivity : AppCompatActivity() {
         Log.v("today_date",today_date.toString())
         Log.v("schedule_date",date.toString())
 
-        binding.dateTextView.text = intent.getStringExtra("year")+"年"+intent.getStringExtra("month")+"月"+intent.getStringExtra("day")+"日"
+        binding.dateTextView.text = year.toString()+"年"+month.toString()+"月"+day.toString()+"日"
         binding.titleTextView.text = intent.getStringExtra("title")
         binding.contentTextView.text = intent.getStringExtra("content")
 
@@ -55,9 +54,8 @@ class DetailActivity : AppCompatActivity() {
                 .setTitle("タイトル:"+binding.titleTextView.text+"\n"+"内容:"+binding.contentTextView.text)
                 .setMessage("削除しますか?")
                 .setPositiveButton("はい", { dialog, which ->
-                    //Log.v("repetitionRule",repetitionRule.toString())
-                    //Log.v("repeatWay",repeatWay.toString())
-                    if (repetitionRule != null){
+                    Log.v("repetitionRule",repetitionRule.toString())
+                    if (repetitionRule != 0){
                         AlertDialog.Builder(this)
                             .setTitle("繰り返すタスクを削除しますか？")
                             .setPositiveButton("はい",{dialog,which ->
@@ -66,49 +64,49 @@ class DetailActivity : AppCompatActivity() {
                                         for (i in 0..100/repetitionRule){
                                             if (dayOfYear != null){
                                                 if (dayOfYear!! >= 336){
-                                                    day = dayOfYear!!-335
-                                                    month = 12
+                                                    day = (dayOfYear!!-335).toString()
+                                                    month = "12"
                                                 }else if (dayOfYear!! >= 306) {
-                                                    day = dayOfYear!! - 305
-                                                    month= 11
+                                                    day = (dayOfYear!! - 305).toString()
+                                                    month= "11"
                                                 }else if (dayOfYear!! >= 275) {
-                                                    day = dayOfYear!! - 274
-                                                    month = 10
+                                                    day = (dayOfYear!! - 274).toString()
+                                                    month = "10"
                                                 }else if (dayOfYear!! >= 245) {
-                                                    day = dayOfYear!! - 244
-                                                    month = 9
+                                                    day = (dayOfYear!! - 244).toString()
+                                                    month = "9"
                                                 }else if (dayOfYear!! >= 214) {
-                                                    day = dayOfYear!! - 213
-                                                    month = 8
+                                                    day = (dayOfYear!! - 213).toString()
+                                                    month = "8"
                                                 }else if (dayOfYear!! >= 183) {
-                                                    day = dayOfYear!! - 182
-                                                    month = 7
+                                                    day = (dayOfYear!! - 182).toString()
+                                                    month = "7"
                                                 }else if (dayOfYear!! >= 153) {
-                                                    day = dayOfYear!! - 152
-                                                    month = 6
+                                                    day = (dayOfYear!! - 152).toString()
+                                                    month = "6"
                                                 }else if (dayOfYear!! >= 122) {
-                                                    day = dayOfYear!! - 121
-                                                    month = 5
+                                                    day = (dayOfYear!! - 121).toString()
+                                                    month = "5"
                                                 }else if (dayOfYear!! >= 92) {
-                                                    day = dayOfYear!! - 91
-                                                    month = 4
+                                                    day = (dayOfYear!! - 91).toString()
+                                                    month = "4"
                                                 }else if (dayOfYear!! >= 61) {
-                                                    day = dayOfYear!! - 60
-                                                    month = 3
+                                                    day = (dayOfYear!! - 60).toString()
+                                                    month = "3"
                                                 }else if (dayOfYear!! >= 32) {
-                                                    day = dayOfYear!! - 31
-                                                    month = 2
+                                                    day = (dayOfYear!! - 31).toString()
+                                                    month = "2"
                                                 }else{
-                                                    day = dayOfYear!!
-                                                    month = 1
+                                                    day = dayOfYear.toString()!!
+                                                    month = "1"
                                                 }
                                             }
 
                                             val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
                                             val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
-                                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day).findAll()
-                                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month).findAll()
-                                            val task_delete = task_delete_tmp4.where().equalTo("year",year).findAll()
+                                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
+                                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
+                                            val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
                                             task_delete.deleteFromRealm(0)
 
                                             dayOfYear = dayOfYear!! + repetitionRule
@@ -132,9 +130,9 @@ class DetailActivity : AppCompatActivity() {
                                 realm.executeTransaction{
                                     val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
                                     val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
-                                    val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day).findAll()
-                                    val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month).findAll()
-                                    val task_delete = task_delete_tmp4.where().equalTo("year",year).findAll()
+                                    val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
+                                    val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
+                                    val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
                                     task_delete.deleteFromRealm(0)
                                     val mainIntent = Intent(this,MainActivity::class.java).run {
                                         condition = 2
@@ -153,9 +151,9 @@ class DetailActivity : AppCompatActivity() {
                         realm.executeTransaction{
                             val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
                             val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
-                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day).findAll()
-                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month).findAll()
-                            val task_delete = task_delete_tmp4.where().equalTo("year",year).findAll()
+                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
+                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
+                            val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
                             task_delete.deleteFromRealm(0)
                             val mainIntent = Intent(this,MainActivity::class.java).run {
                                 condition = 2
@@ -190,9 +188,9 @@ class DetailActivity : AppCompatActivity() {
 
             val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
             val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
-            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day).findAll()
-            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month).findAll()
-            val task_delete = task_delete_tmp4.where().equalTo("year",year).findAll()
+            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
+            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
+            val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
 
             realm.executeTransaction{
                 task_delete.deleteFromRealm(0)

@@ -85,6 +85,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         holder.container.setOnClickListener {
             //val date = LocalDate.of(item.year.toInt(),item.month.toInt(),item.day.toInt())
             //val dayOfYear = date.dayOfYear
+            Log.d("memo_year",item.year)
             val detailIntent = Intent(context,DetailActivity::class.java).run {
                 putExtra("year",item.year)
                 putExtra("month",item.month)
