@@ -6,6 +6,20 @@
     android:layout_height="match_parent"
     tools:context=".DetailActivity">
 
+    <Button
+        android:id="@+id/backIncompleteTasksButton"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="8dp"
+        android:layout_weight="1"
+        android:backgroundTint="#9C27B0"
+        android:text="未完了のタスク一覧に戻る"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/linearLayout4" />
+
     <TextView
         android:id="@+id/titleTextView"
         android:layout_width="0dp"
@@ -48,6 +62,7 @@
         app:layout_constraintTop_toBottomOf="@+id/titleTextView" />
 
     <LinearLayout
+        android:id="@+id/linearLayout4"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"

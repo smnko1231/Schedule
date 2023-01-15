@@ -66,20 +66,6 @@ class MainActivity : AppCompatActivity() {
         Log.d("flag?",Flag.toString())
 
         val dt = LocalDate.now()
-        val today_year = dt.year
-        val today_month = dt.monthValue
-        var today_day = 0
-        if (Flag == "today" || Flag == null){
-            today_day = dt.dayOfMonth
-        }else if (Flag == "tomorrow"){
-            today_day = dt.dayOfMonth+1
-        }
-
-        val CHANNEL_ID = "channel_id"
-        val channel_name = "channel_name"
-        val channel_description = "channel_description "
-        var notificationId = 0
-
         val intent_year = intent.getStringExtra("year")
         val intent_month = intent.getStringExtra("month")
         val intent_day = intent.getStringExtra("day")
@@ -88,15 +74,39 @@ class MainActivity : AppCompatActivity() {
         val intent_isComplete = intent.getBooleanExtra("isComplete", false)
         var intent_date = dt
         val intent_condition = intent.getIntExtra("condition", 0)
-        Log.d("condition", intent_condition.toString())
+        Log.d("intent_year", intent_year.toString())
         val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/[]d")
+        val today_year = dt.year
+        val today_month = dt.monthValue
+        var today_day = 0
+        val requestcode = (1..100)
+        val requestcode2 = (1..100)
+
+        if (Flag == "today"){
+            today_day = dt.dayOfMonth
+            //intent_day = today_day.toString()
+        }else if (Flag == "tomorrow"){
+            today_day = dt.dayOfMonth+1
+            //intent_day = today_day.toString()
+            Log.d("plusdays",intent_date.toString())
+            intent_date = intent_date.plusDays(1)
+            Log.d("plusdays",intent_date.toString())
+        }else if (Flag == null){
+            today_day = dt.dayOfMonth
+        }
+
+        val CHANNEL_ID = "channel_id"
+        val channel_name = "channel_name"
+        val channel_description = "channel_description "
+        var notificationId = 0
+
         if (intent_day != null && intent_month != null && intent_year != null) {
             intent_date = LocalDate.parse("$intent_year/$intent_month/$intent_day", csvFormat)
-
+            Log.d("date", (intent_date.atStartOfDay(ZoneId.systemDefault()).toEpochSecond() * 1000).toString())
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 val name = channel_name
                 val descriptionText = channel_description
-                val importance = NotificationManager.IMPORTANCE_DEFAULT
+                val importance = NotificationManager.IMPORTANCE_HIGH
                 val channel = NotificationChannel(CHANNEL_ID, name, importance).apply {
                     description = descriptionText
                 }
@@ -121,13 +131,14 @@ class MainActivity : AppCompatActivity() {
             if (Flag == "today" || Flag == null){
                 Day = today_day.toString()
             }else if (Flag == "tomorrow"){
-                Day = tomorrow.toString()
+                Day = (tomorrow-1).toString()
             }
         }
         Log.d("tomorrow?",Day)
 
         val zoneId = ZoneId.systemDefault()
         val millis = intent_date.atStartOfDay(zoneId).toEpochSecond() * 1000
+        Log.d("d", millis.toString())
         binding.calendarView.date = millis
 
         val date = "$Year/$Month/$Day"
@@ -179,18 +190,21 @@ class MainActivity : AppCompatActivity() {
             if (m.isComplete == false) {
                 if (m.year == Year && m.month == Month && m.day == Day) {
                     viewList.add(Memo(m.id, m.year, m.month, m.day, m.title, m.content, m.isComplete))
-                    if (intent_day == null && intent_month == null && intent_year == null) {
+                    if (intent_day == null && intent_month == null && intent_year == null && Flag != "tomorrow") {
                         val flag = "today"
 
-                        val notificationIntent = Intent(this,notifyActivity::class.java)
+                        val notificationIntent = Intent(this,notifyActivity::class.java).apply {
+                            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                        }
                         notificationIntent.putExtra("flag",flag)
 
                         var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                             .setSmallIcon(R.drawable.check_image)
                             .setContentTitle("今日の予定")
                             .setContentText(m.title+" "+m.content)
-                            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                            .setContentIntent(PendingIntent.getActivity(this,0,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT))
+                            .setPriority(NotificationCompat.PRIORITY_HIGH)
+                            //.setAutoCancel(true)
+                            .setContentIntent(PendingIntent.getActivity(this,requestcode.random(),notificationIntent, PendingIntent.FLAG_UPDATE_CURRENT))
                         /*Year = today_year.toString()
                         Month = today_month.toString()
                         Day = today_day.toString()*/
@@ -219,17 +233,20 @@ class MainActivity : AppCompatActivity() {
             for (m in memo){
                 if (m.isComplete == false){
                     if (m.year == today_year.toString() && m.month == today_month.toString() && m.day == tomorrow.toString()){
-                        if (intent_day == null && intent_month == null && intent_year == null) {
+                        if (intent_day == null && intent_month == null && intent_year == null && Flag != "tomorrow") {
                             val flag = "tomorrow"
-                            val notificationIntent = Intent(this,notifyActivity::class.java)
+                            val notificationIntent = Intent(this,notifyActivity::class.java).apply {
+                                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            }
                             notificationIntent.putExtra("flag",flag)
 
                             var builder = NotificationCompat.Builder(this, CHANNEL_ID)
                                 .setSmallIcon(R.drawable.check_image)
                                 .setContentTitle("明日の予定")
                                 .setContentText(m.title+" "+m.content)
-                                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-                                .setContentIntent(PendingIntent.getActivity(this,0,notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT))
+                                .setPriority(NotificationCompat.PRIORITY_LOW)
+                                //.setAutoCancel(true)
+                                .setContentIntent(PendingIntent.getActivity(this,requestcode2.random(),notificationIntent,PendingIntent.FLAG_UPDATE_CURRENT))
                             /*Year = today_year.toString()
                             Month = today_month.toString()
                             Day = tomorrow.toString()*/
@@ -269,6 +286,30 @@ class MainActivity : AppCompatActivity() {
             }
             adapter.itemClear()
             adapter.addall(viewList)
+        }
+
+        var incompleteTasksCount = 0
+        for (m in memo){
+            if (m.isComplete == false) {
+                val schedule_date = LocalDate.of(m.year.toInt(), m.month.toInt(), m.day.toInt())
+                if (dt > schedule_date){
+                    incompleteTasksCount++
+                }
+            }
+        }
+
+        binding.incompleteButton.text = incompleteTasksCount.toString()+"件の未完了のタスク"
+
+        binding.incompleteButton.setOnClickListener{
+            val IncompleteTasks = Intent(this,ViewIncompleteTasksActivity::class.java).run {
+                putExtra("today_year",today_year)
+                putExtra("today_month",today_month)
+                putExtra("today_day",today_day)
+                putExtra("year", Year)
+                putExtra("month", Month)
+                putExtra("day", Day)
+            }
+            startActivity(IncompleteTasks)
         }
     }
 

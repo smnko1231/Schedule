@@ -11,6 +11,13 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Schedule">
         <activity
+            android:name=".ViewIncompleteTasksActivity"
+            android:exported="false">
+            <meta-data
+                android:name="android.app.lib_name"
+                android:value="" />
+        </activity>
+        <activity
             android:name=".notifyActivity"
             android:exported="false">
             <meta-data

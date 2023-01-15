@@ -2,16 +2,20 @@ package app.nakao.shoma.schedule
 
 import android.content.Context
 import android.content.Intent
+import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
+import androidx.annotation.RequiresApi
 import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import app.nakao.shoma.schedule.databinding.ActivityDetailBinding
 import com.airbnb.lottie.LottieAnimationView
 import io.realm.Realm
+import java.time.LocalDate
 
 class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter.ViewHolder>() {
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view){
@@ -28,11 +32,15 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
 
     var isComplete:Boolean = false
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    val dt = LocalDate.now()
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(context).inflate(R.layout.activity_recycler_view_adapter,parent,false)
         return ViewHolder(view)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = items[position]
         holder.titleText.text = item.title
@@ -63,9 +71,21 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
                 isComplete = false
             }
 
+            /*if (dt>LocalDate.of(item.year.toInt(),item.month.toInt(),item.day.toInt())){
+                val mainIntent = Intent(context,MainActivity::class.java).run {
+                    putExtra("year",item.year)
+                    putExtra("month",item.month)
+                    putExtra("day",item.day)
+                }
+                context.startActivity(mainIntent)
+            }*/
+
             updateRealm(item.id,isComplete)
         }
         holder.container.setOnClickListener {
+            Log.d("repetitionRule",item.repetitionRule.toString())
+            Log.d("repeatWay",item.repeatWay)
+            Log.d("schedule_day",item.day)
             val detailIntent = Intent(context,DetailActivity::class.java).run {
                 putExtra("year",item.year)
                 putExtra("month",item.month)
@@ -73,6 +93,8 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
                 putExtra("title",item.title)
                 putExtra("content",item.content)
                 putExtra("isComplete",item.isComplete)
+                putExtra("repetitionRule",item.repetitionRule)
+                putExtra("repeatWay",item.repeatWay)
             }
             context.startActivity(detailIntent)
         }

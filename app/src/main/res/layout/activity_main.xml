@@ -22,7 +22,6 @@
         android:id="@+id/calendarView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -31,12 +30,22 @@
         android:id="@+id/returnTodayButton"
         android:layout_width="0dp"
         android:layout_height="38dp"
-        android:layout_marginEnd="32dp"
         android:background="@drawable/background_rounded_corners"
         android:text="今日に戻る"
         app:backgroundTint="#03A9F4"
-        app:layout_constraintBottom_toTopOf="@+id/RV"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintBottom_toBottomOf="@+id/calendarView"
+        app:layout_constraintEnd_toEndOf="@+id/calendarView" />
+
+    <Button
+        android:id="@+id/incompleteButton"
+        android:layout_width="0dp"
+        android:layout_height="38dp"
+        android:background="@drawable/background_rounded_corners"
+        android:text="0件の未完了のタスク"
+        app:backgroundTint="#9C27B0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/returnTodayButton" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/RV"
@@ -46,8 +55,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/calendarView"
-        app:layout_constraintVertical_bias="0.0">
+        app:layout_constraintTop_toBottomOf="@+id/incompleteButton">
 
     </androidx.recyclerview.widget.RecyclerView>
 

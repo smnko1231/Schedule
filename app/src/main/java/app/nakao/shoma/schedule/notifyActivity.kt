@@ -16,5 +16,6 @@ class notifyActivity : AppCompatActivity() {
             putExtra("flag",flag)
         }
         startActivity(mainIntent)
+        finish()
     }
 }

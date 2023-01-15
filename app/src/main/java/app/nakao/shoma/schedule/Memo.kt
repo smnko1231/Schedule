@@ -12,4 +12,6 @@ open class Memo(
     open var title:String = "",
     open var content: String = "",
     open var isComplete: Boolean = false,
+    open var repetitionRule:Int = 0,
+    open var repeatWay: String = ""
 ):RealmObject()

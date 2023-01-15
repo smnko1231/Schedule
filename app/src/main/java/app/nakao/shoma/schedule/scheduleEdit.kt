@@ -57,6 +57,7 @@ class scheduleEdit : AppCompatActivity() {
         var repeat = ""
         var repetition_rule = 0
         var leap = 0
+        var repeatWay = ""
 
         var year = intent.getStringExtra("year")
         var month = intent.getStringExtra("month")
@@ -106,8 +107,7 @@ class scheduleEdit : AppCompatActivity() {
             val intent_month = month
             val intent_year = year
             val csvFormat = DateTimeFormatter.ofPattern("yyyy/[]M/[]d")
-            val intent_date = LocalDate.parse("$intent_year/$intent_month/$intent_day",
-                csvFormat)
+            val intent_date = LocalDate.parse("$intent_year/$intent_month/$intent_day", csvFormat)
             var dayOfYear = intent_date.dayOfYear
             Log.d("dayofyear",dayOfYear.toString())
             var day_int = day?.toInt()
@@ -116,10 +116,12 @@ class scheduleEdit : AppCompatActivity() {
             val isComplete = intent.getBooleanExtra("isComplete",false)
             var intent_condition = intent.getIntExtra("condition",0)
             Log.d("customedit",binding.customEditText.text.toString())
+
+            val a = 0
+
             if (binding.customEditText.text.toString() != ""){
                 repetition_rule = binding.customEditText.text.toString().toInt()
             }
-            Log.d("repetition_rule",binding.customEditText.text.toString())
 
             Log.d("repeatType",repeat.toString())
 
@@ -141,10 +143,11 @@ class scheduleEdit : AppCompatActivity() {
                     .show()
             }else{
                 if (year != null && month != null && day != null) {
+                    repeatWay = binding.repeatSpinner.toString()
                     if ((binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "日"){
-                        Log.d("repeatday",repeat.toString())
                         for (i in 1..100/repetition_rule){
-                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                            Log.v("repetitionRule",repetition_rule.toString())
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
                             if (dayOfYear != null){
                                 dayOfYear = dayOfYear + repetition_rule
                             }
@@ -204,34 +207,34 @@ class scheduleEdit : AppCompatActivity() {
                                     day_int = dayOfYear-334
                                     month_int = 12
                                 }else if (dayOfYear >= 305) {
-                                    day_int = dayOfYear - 304
+                                    day_int = dayOfYear-304
                                     month_int = 11
                                 }else if (dayOfYear >= 274) {
-                                    day_int = dayOfYear - 273
+                                    day_int = dayOfYear-273
                                     month_int = 10
                                 }else if (dayOfYear >= 244) {
-                                    day_int = dayOfYear - 243
+                                    day_int = dayOfYear-243
                                     month_int = 9
                                 }else if (dayOfYear >= 213) {
-                                    day_int = dayOfYear - 212
+                                    day_int = dayOfYear-212
                                     month_int = 8
                                 }else if (dayOfYear >= 182) {
-                                    day_int = dayOfYear - 181
+                                    day_int = dayOfYear-181
                                     month_int = 7
                                 }else if (dayOfYear >= 152) {
-                                    day_int = dayOfYear - 151
+                                    day_int = dayOfYear-151
                                     month_int = 6
                                 }else if (dayOfYear >= 121) {
-                                    day_int = dayOfYear - 120
+                                    day_int = dayOfYear-120
                                     month_int = 5
                                 }else if (dayOfYear >= 91) {
-                                    day_int = dayOfYear - 90
+                                    day_int = dayOfYear-90
                                     month_int = 4
                                 }else if (dayOfYear >= 60) {
-                                    day_int = dayOfYear - 59
+                                    day_int = dayOfYear-59
                                     month_int = 3
                                 }else if (dayOfYear >= 32) {
-                                    day_int = dayOfYear - 31
+                                    day_int = dayOfYear-31
                                     month_int = 2
                                 }else{
                                     day_int = dayOfYear
@@ -240,11 +243,11 @@ class scheduleEdit : AppCompatActivity() {
                             }
                             month = month_int.toString()
                             day = day_int.toString()
-                            Log.d("day",day.toString())
+                            Log.d("repeatday",day.toString())
                         }
                     }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "週"){
                         for (i in 1..12/repetition_rule){
-                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
                             if (dayOfYear != null){
                                 dayOfYear = dayOfYear + repetition_rule*7
                             }
@@ -340,10 +343,11 @@ class scheduleEdit : AppCompatActivity() {
                             }
                             month = month_int.toString()
                             day = day_int.toString()
+                            Log.d("repeatweek",day_int.toString())
                         }
                     }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == true && binding.repeatYearSwich.isChecked == false) || repeat == "月"){
                         for (i in 1..12/repetition_rule){
-                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
                             if (month_int != null){
                                 month_int = month_int + repetition_rule
                             }
@@ -351,14 +355,14 @@ class scheduleEdit : AppCompatActivity() {
                         }
                     }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == true){
                         for (i in 1..10){
-                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
                             if (year_int != null){
                                 year_int++
                             }
                             year = year_int.toString()
                         }
                     }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "未選択"){
-                        save(year.toString(),month.toString(),day.toString() ,title,content,isComplete)
+                        save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
                     }
                 }
 
@@ -383,7 +387,7 @@ class scheduleEdit : AppCompatActivity() {
             Log.d("condition",condition.toString())
             if (condition?.toInt() == 3){
                 if (year != null && month != null && day != null && intent_title != null && intent_content != null) {
-                    save(year,month,day ,intent_title.toString(),intent_content.toString(),isComplete)
+                    save(year,month,day ,intent_title.toString(),intent_content.toString(),isComplete,repetition_rule,repeatWay)
                 }
             }
 
@@ -407,7 +411,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatMonthSwich.isChecked = false
             binding.repeatDaySwich.isChecked = false
             binding.repeatYearSwich.isChecked = false
-            repetition_rule = 7
+            repetition_rule = 1
             binding.repeatSpinner.setSelection(0)
         }
 
@@ -426,6 +430,8 @@ class scheduleEdit : AppCompatActivity() {
             repetition_rule = 1
             binding.repeatSpinner.setSelection(0)
         }
+
+        Log.d("repetition_rule",binding.customEditText.text.toString())
 
         /*
 
@@ -470,7 +476,7 @@ class scheduleEdit : AppCompatActivity() {
         }
     }
 
-    fun save(year:String,month:String, day:String, title:String,content:String,isComplete:Boolean){
+    fun save(year:String,month:String, day:String, title:String,content:String,isComplete:Boolean,repetition_rule:Int,repeatWay:String){
         val memo: Memo? = read()
 
         val sharedPreferences = getSharedPreferences("saveId", Context.MODE_PRIVATE)
@@ -487,8 +493,10 @@ class scheduleEdit : AppCompatActivity() {
             memo.title = title
             memo.content = content
             memo.isComplete = isComplete
+            memo.repetitionRule = repetition_rule
+            memo.repeatWay = repeatWay
 
-            Log.d("save", id.toString() + ":" +memo.year+ memo.month+memo.day)
+            Log.d("repetitionRule",memo.repetitionRule.toString())
         }
         sharedPreferences.edit().putInt("saveId",id).apply()
     }
