@@ -64,46 +64,12 @@ class DetailActivity : AppCompatActivity() {
                                         for (i in 0..100/repetitionRule){ // 予定は100日後までしか繰り返さない
                                             Log.d("dayofyear",dayOfYear.toString())
                                             Log.d("dayofmonth",day.toString())
-                                            //month(dayOfYear,day,month)
-                                            if (dayOfYear != null){
-                                                if (dayOfYear!! >= 336){
-                                                    day = (dayOfYear!!-335).toString()
-                                                    month = "12"
-                                                }else if (dayOfYear!! >= 306) {
-                                                    day = (dayOfYear!! - 305).toString()
-                                                    month= "11"
-                                                }else if (dayOfYear!! >= 275) {
-                                                    day = (dayOfYear!! - 274).toString()
-                                                    month = "10"
-                                                }else if (dayOfYear!! >= 245) {
-                                                    day = (dayOfYear!! - 244).toString()
-                                                    month = "9"
-                                                }else if (dayOfYear!! >= 214) {
-                                                    day = (dayOfYear!! - 213).toString()
-                                                    month = "8"
-                                                }else if (dayOfYear!! >= 183) {
-                                                    day = (dayOfYear!! - 182).toString()
-                                                    month = "7"
-                                                }else if (dayOfYear!! >= 153) {
-                                                    day = (dayOfYear!! - 152).toString()
-                                                    month = "6"
-                                                }else if (dayOfYear!! >= 122) {
-                                                    day = (dayOfYear!! - 121).toString()
-                                                    month = "5"
-                                                }else if (dayOfYear!! >= 92) {
-                                                    day = (dayOfYear!! - 91).toString()
-                                                    month = "4"
-                                                }else if (dayOfYear!! >= 61) {
-                                                    day = (dayOfYear!! - 60).toString()
-                                                    month = "3"
-                                                }else if (dayOfYear!! >= 32) {
-                                                    day = (dayOfYear!! - 31).toString()
-                                                    month = "2"
-                                                }else{
-                                                    day = dayOfYear.toString()!!
-                                                    month = "1"
-                                                }
-                                            }
+
+                                            month = getMonthAsDayOfYear(dayOfYear)
+                                            day = getDayAsDayOfYear(dayOfYear)
+
+                                            Log.d("month",month.toString())
+
                                             taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
                                             dayOfYear = dayOfYear!! + repetitionRule
                                         }
@@ -207,49 +173,68 @@ class DetailActivity : AppCompatActivity() {
         return realm.where(Memo::class.java).findFirst()
     }
 
-    //@RequiresApi(Build.VERSION_CODES.O)
-    fun month(dayOfYear: Int, day: String,month: String){
+    fun getMonthAsDayOfYear(dayOfYear: Int): String {
+        var month = ""
         if (dayOfYear != null){
-            var day:String
-            var month:String
             if (dayOfYear!! >= 336){
-                day = (dayOfYear!!-335).toString()
                 month = "12"
             }else if (dayOfYear!! >= 306) {
-                day = (dayOfYear!! - 305).toString()
                 month= "11"
             }else if (dayOfYear!! >= 275) {
-                day = (dayOfYear!! - 274).toString()
                 month = "10"
             }else if (dayOfYear!! >= 245) {
-                day = (dayOfYear!! - 244).toString()
                 month = "9"
             }else if (dayOfYear!! >= 214) {
-                day = (dayOfYear!! - 213).toString()
                 month = "8"
             }else if (dayOfYear!! >= 183) {
-                day = (dayOfYear!! - 182).toString()
                 month = "7"
             }else if (dayOfYear!! >= 153) {
-                day = (dayOfYear!! - 152).toString()
                 month = "6"
             }else if (dayOfYear!! >= 122) {
-                day = (dayOfYear!! - 121).toString()
                 month = "5"
             }else if (dayOfYear!! >= 92) {
-                day = (dayOfYear!! - 91).toString()
                 month = "4"
             }else if (dayOfYear!! >= 61) {
-                day = (dayOfYear!! - 60).toString()
                 month = "3"
             }else if (dayOfYear!! >= 32) {
-                day = (dayOfYear!! - 31).toString()
                 month = "2"
             }else{
-                day = dayOfYear.toString()!!
                 month = "1"
             }
         }
+        return month
+    }
+
+    fun getDayAsDayOfYear(dayOfYear: Int): String{
+        var day = ""
+        if (dayOfYear != null){
+            if (dayOfYear!! >= 336){
+                day = (dayOfYear!!-335).toString()
+            }else if (dayOfYear!! >= 306) {
+                day = (dayOfYear!! - 305).toString()
+            }else if (dayOfYear!! >= 275) {
+                day = (dayOfYear!! - 274).toString()
+            }else if (dayOfYear!! >= 245) {
+                day = (dayOfYear!! - 244).toString()
+            }else if (dayOfYear!! >= 214) {
+                day = (dayOfYear!! - 213).toString()
+            }else if (dayOfYear!! >= 183) {
+                day = (dayOfYear!! - 182).toString()
+            }else if (dayOfYear!! >= 153) {
+                day = (dayOfYear!! - 152).toString()
+            }else if (dayOfYear!! >= 122) {
+                day = (dayOfYear!! - 121).toString()
+            }else if (dayOfYear!! >= 92) {
+                day = (dayOfYear!! - 91).toString()
+            }else if (dayOfYear!! >= 61) {
+                day = (dayOfYear!! - 60).toString()
+            }else if (dayOfYear!! >= 32) {
+                day = (dayOfYear!! - 31).toString()
+            }else{
+                day = dayOfYear.toString()!!
+            }
+        }
+        return day
     }
 
     fun taskDelete(content:String,title:String,day:String,month:String,year:String){
