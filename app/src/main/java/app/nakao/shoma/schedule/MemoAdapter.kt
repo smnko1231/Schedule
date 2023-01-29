@@ -85,9 +85,9 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         holder.container.setOnClickListener {
             //val date = LocalDate.of(item.year.toInt(),item.month.toInt(),item.day.toInt())
             //val dayOfYear = date.dayOfYear
-            Log.d("memo_year",item.year)
             val detailIntent = Intent(context,DetailActivity::class.java).run {
                 putExtra("year",item.year)
+                Log.d("memo_year",item.year)
                 putExtra("month",item.month)
                 putExtra("day",item.day)
                 putExtra("title",item.title)
@@ -95,6 +95,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
                 putExtra("isComplete",item.isComplete)
                 putExtra("repetitionRule",item.repetitionRule)
                 putExtra("repeatWay",item.repeatWay)
+                putExtra("number","1")
                 //putExtra("dayofyear",dayOfYear)
             }
             context.startActivity(detailIntent)
