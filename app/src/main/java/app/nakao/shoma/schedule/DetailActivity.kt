@@ -64,12 +64,8 @@ class DetailActivity : AppCompatActivity() {
                                         Log.v("repetitionRule",(100/repetitionRule).toString())
                                         var count = 0
                                         while (true){
-                                            dayOfYear = dayOfYear+repetitionRule
-                                            count++
-                                            Log.d("count",count.toString())
-
-                                            month = getMonthAsDayOfYear(dayOfYear)
-                                            day = getDayAsDayOfYear(dayOfYear)
+                                            month = getMonthAsDayOfYear(dayOfYear,year.toInt())
+                                            day = getDayAsDayOfYear(dayOfYear,year.toInt())
 
                                             Log.d("repetitionrule",repetitionRule.toString())
                                             Log.d("dayofyear",dayOfYear.toString())
@@ -82,6 +78,7 @@ class DetailActivity : AppCompatActivity() {
                                             val task_delete_tmp4 = task_delete_tmp3.where().equalTo("title",title.toString()).findAll()
                                             val task_delete = task_delete_tmp4.where().equalTo("content",content.toString()).findAll()
 
+                                            Log.d("taskdelete",task_delete.toString())
                                             if (task_delete.isEmpty()){
                                                 break
                                             }
@@ -89,11 +86,12 @@ class DetailActivity : AppCompatActivity() {
                                             if (count == 100){
                                                 break
                                             }
-                                            Log.d("taskdelete",task_delete.toString())
 
-                                            //
-                                        // taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
-                                            //dayOfYear = dayOfYear!! + repetitionRule
+                                            taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
+
+                                            dayOfYear = dayOfYear+repetitionRule
+                                            count++
+                                            Log.d("count",count.toString())
                                         }
                                     }
                                     mainIntent(year,month.toString(),day.toString(),title.toString(),content.toString(),isComplete)
@@ -205,66 +203,151 @@ class DetailActivity : AppCompatActivity() {
         return realm.where(Memo::class.java).findFirst()
     }
 
-    fun getMonthAsDayOfYear(dayOfYear: Int): String {
+    fun getMonthAsDayOfYear(dayOfYear: Int,year: Int): String {
+        var leap = 0
+        if (year != null){
+            if (year % 100 == 0){
+                if (year % 400 == 0){
+                    leap = 1
+                }else{
+                    leap = 0
+                }
+            }else if (year % 4 == 0){
+                leap = 1
+            }else{
+                leap = 0
+            }
+        }
         var month = ""
         if (dayOfYear != null){
-            if (dayOfYear!! >= 336){
-                month = "12"
-            }else if (dayOfYear!! >= 306) {
-                month= "11"
-            }else if (dayOfYear!! >= 275) {
-                month = "10"
-            }else if (dayOfYear!! >= 245) {
-                month = "9"
-            }else if (dayOfYear!! >= 214) {
-                month = "8"
-            }else if (dayOfYear!! >= 183) {
-                month = "7"
-            }else if (dayOfYear!! >= 153) {
-                month = "6"
-            }else if (dayOfYear!! >= 122) {
-                month = "5"
-            }else if (dayOfYear!! >= 92) {
-                month = "4"
-            }else if (dayOfYear!! >= 61) {
-                month = "3"
-            }else if (dayOfYear!! >= 32) {
-                month = "2"
+            if (leap == 0){
+                if (dayOfYear!! >= 335){
+                    month = "12"
+                }else if (dayOfYear!! >= 305) {
+                    month= "11"
+                }else if (dayOfYear!! >= 274) {
+                    month = "10"
+                }else if (dayOfYear!! >= 244) {
+                    month = "9"
+                }else if (dayOfYear!! >= 213) {
+                    month = "8"
+                }else if (dayOfYear!! >= 182) {
+                    month = "7"
+                }else if (dayOfYear!! >= 152) {
+                    month = "6"
+                }else if (dayOfYear!! >= 121) {
+                    month = "5"
+                }else if (dayOfYear!! >= 91) {
+                    month = "4"
+                }else if (dayOfYear!! >= 60) {
+                    month = "3"
+                }else if (dayOfYear!! >= 32) {
+                    month = "2"
+                }else{
+                    month = "1"
+                }
             }else{
-                month = "1"
+                if (dayOfYear!! >= 336){
+                    month = "12"
+                }else if (dayOfYear!! >= 306) {
+                    month= "11"
+                }else if (dayOfYear!! >= 275) {
+                    month = "10"
+                }else if (dayOfYear!! >= 245) {
+                    month = "9"
+                }else if (dayOfYear!! >= 214) {
+                    month = "8"
+                }else if (dayOfYear!! >= 183) {
+                    month = "7"
+                }else if (dayOfYear!! >= 153) {
+                    month = "6"
+                }else if (dayOfYear!! >= 122) {
+                    month = "5"
+                }else if (dayOfYear!! >= 92) {
+                    month = "4"
+                }else if (dayOfYear!! >= 61) {
+                    month = "3"
+                }else if (dayOfYear!! >= 32) {
+                    month = "2"
+                }else{
+                    month = "1"
+                }
             }
         }
         return month
     }
 
-    fun getDayAsDayOfYear(dayOfYear: Int): String{
+    fun getDayAsDayOfYear(dayOfYear: Int,year:Int): String{
+        var leap = 0
+        if (year != null){
+            if (year % 100 == 0){
+                if (year % 400 == 0){
+                    leap = 1
+                }else{
+                    leap = 0
+                }
+            }else if (year % 4 == 0){
+                leap = 1
+            }else{
+                leap = 0
+            }
+        }
         var day = ""
         if (dayOfYear != null){
-            if (dayOfYear!! >= 336){
-                day = (dayOfYear!!-335).toString()
-            }else if (dayOfYear!! >= 306) {
-                day = (dayOfYear!! - 305).toString()
-            }else if (dayOfYear!! >= 275) {
-                day = (dayOfYear!! - 274).toString()
-            }else if (dayOfYear!! >= 245) {
-                day = (dayOfYear!! - 244).toString()
-            }else if (dayOfYear!! >= 214) {
-                day = (dayOfYear!! - 213).toString()
-            }else if (dayOfYear!! >= 183) {
-                day = (dayOfYear!! - 182).toString()
-            }else if (dayOfYear!! >= 153) {
-                day = (dayOfYear!! - 152).toString()
-            }else if (dayOfYear!! >= 122) {
-                day = (dayOfYear!! - 121).toString()
-            }else if (dayOfYear!! >= 92) {
-                day = (dayOfYear!! - 91).toString()
-            }else if (dayOfYear!! >= 61) {
-                day = (dayOfYear!! - 60).toString()
-            }else if (dayOfYear!! >= 32) {
-                day = (dayOfYear!! - 31).toString()
+            if (leap == 0){
+                if (dayOfYear!! >= 335){
+                    day = (dayOfYear!!-334).toString()
+                }else if (dayOfYear!! >= 305) {
+                    day = (dayOfYear!! - 304).toString()
+                }else if (dayOfYear!! >= 274) {
+                    day = (dayOfYear!! - 273).toString()
+                }else if (dayOfYear!! >= 244) {
+                    day = (dayOfYear!! - 243).toString()
+                }else if (dayOfYear!! >= 213) {
+                    day = (dayOfYear!! - 212).toString()
+                }else if (dayOfYear!! >= 182) {
+                    day = (dayOfYear!! - 181).toString()
+                }else if (dayOfYear!! >= 152) {
+                    day = (dayOfYear!! - 151).toString()
+                }else if (dayOfYear!! >= 121) {
+                    day = (dayOfYear!! - 120).toString()
+                }else if (dayOfYear!! >= 91) {
+                    day = (dayOfYear!! - 90).toString()
+                }else if (dayOfYear!! >= 60) {
+                    day = (dayOfYear!! - 59).toString()
+                }else if (dayOfYear!! >= 32) {
+                    day = (dayOfYear!! - 31).toString()
+                }else{
+                    day = dayOfYear.toString()!!
+                }
             }else{
-                day = dayOfYear.toString()!!
+                if (dayOfYear!! >= 336){
+                    day = (dayOfYear!!-335).toString()
+                }else if (dayOfYear!! >= 306) {
+                    day = (dayOfYear!! - 305).toString()
+                }else if (dayOfYear!! >= 275) {
+                    day = (dayOfYear!! - 274).toString()
+                }else if (dayOfYear!! >= 245) {
+                    day = (dayOfYear!! - 244).toString()
+                }else if (dayOfYear!! >= 214) {
+                    day = (dayOfYear!! - 213).toString()
+                }else if (dayOfYear!! >= 183) {
+                    day = (dayOfYear!! - 182).toString()
+                }else if (dayOfYear!! >= 153) {
+                    day = (dayOfYear!! - 152).toString()
+                }else if (dayOfYear!! >= 122) {
+                    day = (dayOfYear!! - 121).toString()
+                }else if (dayOfYear!! >= 92) {
+                    day = (dayOfYear!! - 91).toString()
+                }else if (dayOfYear!! >= 61) {
+                    day = (dayOfYear!! - 60).toString()
+                }else if (dayOfYear!! >= 32) {
+                    day = (dayOfYear!! - 31).toString()
+                }else{
+                    day = dayOfYear.toString()!!
+                }
             }
+
         }
         return day
     }
