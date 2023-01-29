@@ -105,72 +105,24 @@ class DetailActivity : AppCompatActivity() {
                                                 }
                                             }
                                             taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
-                                            /*val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
-                                            val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
-                                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
-                                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
-                                            val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
-                                            task_delete.deleteFromRealm(0)*/
                                             dayOfYear = dayOfYear!! + repetitionRule
                                         }
                                     }
-                                    val mainIntent = Intent(this,MainActivity::class.java).run {
-                                        condition = 2
-                                        putExtra("year",year)
-                                        putExtra("month",month)
-                                        putExtra("day",day)
-                                        putExtra("title",title)
-                                        putExtra("content",content)
-                                        putExtra("isComplete",isComplete)
-                                        putExtra("condition",condition)
-                                    }
-                                    startActivity(mainIntent)
+                                    mainIntent(year,month.toString(),day.toString(),title.toString(),content.toString(),isComplete)
                                 }
                             }
                             )
                             .setNegativeButton("いいえ",{dialog,which ->
                                 realm.executeTransaction{
                                     taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
-                                    /*val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
-                                    val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
-                                    val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
-                                    val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
-                                    val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
-                                    task_delete.deleteFromRealm(0)*/
-                                    val mainIntent = Intent(this,MainActivity::class.java).run {
-                                        condition = 2
-                                        putExtra("year",year)
-                                        putExtra("month",month)
-                                        putExtra("day",day)
-                                        putExtra("title",title)
-                                        putExtra("content",content)
-                                        putExtra("isComplete",isComplete)
-                                        putExtra("condition",condition)
-                                    }
-                                    startActivity(mainIntent)
+                                    mainIntent(year,month.toString(),day.toString(),title.toString(),content.toString(),isComplete)
                                 }
                             })
                                 .show()
                     }else{
                         realm.executeTransaction{
                             taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
-                            /*val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
-                            val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
-                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
-                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
-                            val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
-                            task_delete.deleteFromRealm(0)*/
-                            val mainIntent = Intent(this,MainActivity::class.java).run {
-                                condition = 2
-                                putExtra("year",year)
-                                putExtra("month",month)
-                                putExtra("day",day)
-                                putExtra("title",title)
-                                putExtra("content",content)
-                                putExtra("isComplete",isComplete)
-                                putExtra("condition",condition)
-                            }
-                            startActivity(mainIntent)
+                            mainIntent(year,month.toString(),day.toString(),title.toString(),content.toString(),isComplete)
                         }
                     }
                 })
@@ -192,12 +144,6 @@ class DetailActivity : AppCompatActivity() {
             }
 
             realm.executeTransaction{
-                /*val task_delete_tmp = realm.where(Memo::class.java).equalTo("content",content).findAll()
-                val task_delete_tmp2 = task_delete_tmp.where().equalTo("title",title).findAll()
-                val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
-                val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
-                val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
-                task_delete.deleteFromRealm(0)*/
                 taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
                 val mainIntent = Intent(this,MainActivity::class.java)
                 startActivity(mainIntent)
@@ -207,12 +153,7 @@ class DetailActivity : AppCompatActivity() {
         }
 
         binding.backButton.setOnClickListener {
-            val mainIntent = Intent(this,MainActivity::class.java).run {
-                putExtra("year",year)
-                putExtra("month",month)
-                putExtra("day",day)
-            }
-            startActivity(mainIntent)
+            mainIntent(year,month.toString(),day.toString(),title.toString(),content.toString(),isComplete)
         }
 
         if (today_date>date && isComplete == false){
@@ -318,5 +259,19 @@ class DetailActivity : AppCompatActivity() {
         val task_delete_tmp4 = task_delete_tmp3.where().equalTo("month",month.toString()).findAll()
         val task_delete = task_delete_tmp4.where().equalTo("year",year.toString()).findAll()
         task_delete.deleteFromRealm(0)
+    }
+
+    fun mainIntent(year:String,month: String,day:String,title: String,content: String,isComplete:Boolean){
+        val mainIntent = Intent(this,MainActivity::class.java).run {
+            val condition = 2
+            putExtra("year",year)
+            putExtra("month",month)
+            putExtra("day",day)
+            putExtra("title",title)
+            putExtra("content",content)
+            putExtra("isComplete",isComplete)
+            putExtra("condition",condition)
+        }
+        startActivity(mainIntent)
     }
 }
