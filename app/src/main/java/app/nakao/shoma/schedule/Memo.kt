@@ -13,5 +13,6 @@ open class Memo(
     open var content: String = "",
     open var isComplete: Boolean = false,
     open var repetitionRule:Int = 0,
-    open var repeatWay: String = ""
+    open var repeatWay: String = "",
+    open var image: ByteArray? = null
 ):RealmObject()

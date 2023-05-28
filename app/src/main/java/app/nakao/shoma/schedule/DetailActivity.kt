@@ -2,19 +2,19 @@ package app.nakao.shoma.schedule
 
 import android.annotation.SuppressLint
 import android.content.Intent
+import android.graphics.Bitmap
 import android.os.Build
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import androidx.annotation.RequiresApi
-import io.realm.Realm
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import app.nakao.shoma.schedule.databinding.ActivityDetailBinding
+import io.realm.Realm
+import java.nio.ByteBuffer
 import java.time.LocalDate
-import java.time.Month
-import kotlin.math.log
-import kotlin.time.days
+
 
 class DetailActivity : AppCompatActivity() {
 
@@ -40,6 +40,7 @@ class DetailActivity : AppCompatActivity() {
         val isComplete = intent.getBooleanExtra("isComplete",false)
         val repetitionRule = intent.getIntExtra("repetitionRule",0)
         val repeatWay = intent.getStringExtra("repeatWay")
+        val photo = intent.getByteArrayExtra("photo")
         val date = LocalDate.of(year!!.toInt(),month!!.toInt(),day!!.toInt())
         var dayOfYear = date.dayOfYear
         //var month = date.monthValue
@@ -53,6 +54,9 @@ class DetailActivity : AppCompatActivity() {
         binding.dateTextView.text = year.toString()+"年"+month.toString()+"月"+day.toString()+"日"
         binding.titleTextView.text = intent.getStringExtra("title")
         binding.contentTextView.text = intent.getStringExtra("content")
+        val bitmap = Bitmap.createBitmap(100, 200, Bitmap.Config.ARGB_8888)
+        bitmap.copyPixelsFromBuffer(ByteBuffer.wrap(photo))
+        binding.selectPhoto.setImageBitmap(bitmap)
 
         binding.deleteButton.setOnClickListener {
             val firstBuilder = AlertDialog.Builder(this)

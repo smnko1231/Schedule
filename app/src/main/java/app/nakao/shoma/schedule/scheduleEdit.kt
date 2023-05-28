@@ -3,7 +3,10 @@ package app.nakao.shoma.schedule
 import android.app.DatePickerDialog
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.graphics.Color
+import android.graphics.drawable.BitmapDrawable
 import android.icu.text.CaseMap
 import android.os.Build
 import androidx.appcompat.app.AppCompatActivity
@@ -20,6 +23,8 @@ import app.nakao.shoma.schedule.databinding.ActivityScheduleEditBinding
 import com.google.android.material.snackbar.Snackbar
 import io.realm.Realm
 import kotlinx.coroutines.newFixedThreadPoolContext
+import java.io.ByteArrayOutputStream
+import java.sql.Blob
 import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.Month
@@ -170,6 +175,8 @@ class scheduleEdit : AppCompatActivity() {
                 Log.d("repetition_rule",repetition_rule.toString())
             }
 
+            createImageData()
+
             if (reconstruction == 1){
                 repeat = intentRepeatWay.toString()
                 repeatWay = repeat
@@ -199,7 +206,7 @@ class scheduleEdit : AppCompatActivity() {
                     if ((binding.repeatDaySwich.isChecked == true &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "日"){
                         Log.v("repetitionRule",repetition_rule.toString())
                         for (i in 1..100/repetition_rule){
-                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay,createImageData())
                             if (dayOfYear != null){
                                 dayOfYear = dayOfYear + repetition_rule
                             }
@@ -429,7 +436,7 @@ class scheduleEdit : AppCompatActivity() {
                         }
                     }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "週"){
                         for (i in 1..12/repetition_rule){
-                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay,createImageData())
                             if (dayOfYear != null){
                                 dayOfYear = dayOfYear + repetition_rule*7
                             }
@@ -529,7 +536,7 @@ class scheduleEdit : AppCompatActivity() {
                         }
                     }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == true && binding.repeatYearSwich.isChecked == false) || repeat == "月"){
                         for (i in 1..12/repetition_rule){
-                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay,createImageData())
                             if (month_int != null){
                                 if (month_int + repetition_rule <= 12){
                                     month_int = month_int + repetition_rule
@@ -545,14 +552,14 @@ class scheduleEdit : AppCompatActivity() {
                         }
                     }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == true){
                         for (i in 1..10){
-                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
+                            save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay,createImageData())
                             if (year_int != null){
                                 year_int++
                             }
                             year = year_int.toString()
                         }
                     }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false || repeat == "未選択"){
-                        save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
+                        save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay,createImageData())
                     }
                 }
 
@@ -577,7 +584,7 @@ class scheduleEdit : AppCompatActivity() {
             Log.d("condition",condition.toString())
             if (condition?.toInt() == 3){
                 if (year != null && month != null && day != null && intent_title != null && intent_content != null) {
-                    save(year,month,day ,intent_title.toString(),intent_content.toString(),isComplete,repetition_rule,repeatWay)
+                    save(year,month,day ,intent_title.toString(),intent_content.toString(),isComplete,repetition_rule,repeatWay,createImageData())
                 }
             }
 
@@ -629,9 +636,13 @@ class scheduleEdit : AppCompatActivity() {
         binding.dateChangeButton.setOnClickListener {
             showDatePickerDialog()
         }
+
+        binding.selectPhotoButton.setOnClickListener {
+            selectPhoto()
+        }
     }
 
-    fun save(year:String,month:String, day:String, title:String,content:String,isComplete:Boolean,repetition_rule:Int,repeatWay:String){
+    fun save(year:String,month:String, day:String, title:String,content:String,isComplete:Boolean,repetition_rule:Int,repeatWay:String,Image:ByteArray){
         val memo: Memo? = read()
 
         val sharedPreferences = getSharedPreferences("saveId", Context.MODE_PRIVATE)
@@ -650,9 +661,11 @@ class scheduleEdit : AppCompatActivity() {
             memo.isComplete = isComplete
             memo.repetitionRule = repetition_rule
             memo.repeatWay = repeatWay
+            memo.image = Image
 
             Log.d("repetitionRule",memo.repetitionRule.toString())
             Log.v("item_id",memo.id.toString())
+            Log.d("photo",memo.image.toString())
         }
         sharedPreferences.edit().putInt("saveId",id).apply()
     }
@@ -687,6 +700,47 @@ class scheduleEdit : AppCompatActivity() {
             calendar.get(Calendar.DAY_OF_MONTH)
         ).apply {
         }.show()
+    }
+
+    private fun selectPhoto() {
+        val intent = Intent(Intent.ACTION_OPEN_DOCUMENT).apply {
+            addCategory(Intent.CATEGORY_OPENABLE)
+            type = "image/*"
+        }
+        startActivityForResult(intent, READ_REQUEST_CODE)
+    }
+
+    companion object {
+        private const val READ_REQUEST_CODE: Int = 42
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, resultData: Intent?) {
+        super.onActivityResult(requestCode, resultCode, resultData)
+        if (resultCode != RESULT_OK) {
+            return
+        }
+        when (requestCode) {
+            READ_REQUEST_CODE -> {
+                try {
+                    resultData?.data?.also { uri ->
+                        val inputStream = contentResolver?.openInputStream(uri)
+                        val image = BitmapFactory.decodeStream(inputStream)
+                        val imageView = findViewById<ImageView>(R.id.imageView)
+                        imageView.setImageBitmap(image)
+                    }
+                } catch (e: Exception) {
+                    Toast.makeText(this, "エラーが発生しました", Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+    }
+
+    fun createImageData() : ByteArray {
+        val bitmap = (binding.imageView.drawable as BitmapDrawable).bitmap
+        val baos = ByteArrayOutputStream()
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+        val imageByteArray = baos.toByteArray()
+        return imageByteArray
     }
 }
 

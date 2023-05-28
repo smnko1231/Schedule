@@ -46,6 +46,9 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
         holder.titleText.text = item.title
         holder.contentText.text = item.content
 
+        Log.d("photo_adapter",item.image.toString())
+        Log.v("photo_adapter",item.title)
+
         if(item.isComplete == true){
             holder.completionButton.text = "未完了"
             holder.lottieAnimationCompleteView.visibility = View.VISIBLE
@@ -95,6 +98,7 @@ class MemoAdapter(private var context: Context):RecyclerView.Adapter<MemoAdapter
                 putExtra("isComplete",item.isComplete)
                 putExtra("repetitionRule",item.repetitionRule)
                 putExtra("repeatWay",item.repeatWay)
+                putExtra("photo",item.image)
                 putExtra("number","1")
                 //putExtra("dayofyear",dayOfYear)
             }
