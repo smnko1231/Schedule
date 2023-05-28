@@ -28,8 +28,13 @@ class DetailActivity : AppCompatActivity() {
         binding = ActivityDetailBinding.inflate(layoutInflater).apply { setContentView(this.root) }
 
         var year = intent.getStringExtra("year")
+        var year_int = year?.toInt()
+        val year_now = year
         var month = intent.getStringExtra("month")
+        var month_int = month?.toInt()
+        val month_now = month
         var day = intent.getStringExtra("day")
+        val day_now = day
         val title = intent.getStringExtra("title")
         val content = intent.getStringExtra("content")
         val isComplete = intent.getBooleanExtra("isComplete",false)
@@ -37,6 +42,7 @@ class DetailActivity : AppCompatActivity() {
         val repeatWay = intent.getStringExtra("repeatWay")
         val date = LocalDate.of(year!!.toInt(),month!!.toInt(),day!!.toInt())
         var dayOfYear = date.dayOfYear
+        //var month = date.monthValue
         var condition:Int
 
         val dt = LocalDate.now()
@@ -54,6 +60,7 @@ class DetailActivity : AppCompatActivity() {
                 .setTitle("タイトル:"+binding.titleTextView.text+"\n"+"内容:"+binding.contentTextView.text)
                 .setMessage("削除しますか?")
                 .setPositiveButton("はい", { dialog, which ->
+                    Log.d("repeatWay",repeatWay.toString())
                     if (repetitionRule != 0){
                         val secondBuilder = AlertDialog.Builder(this)
                             secondBuilder
@@ -64,8 +71,8 @@ class DetailActivity : AppCompatActivity() {
                                         Log.v("repetitionRule",(100/repetitionRule).toString())
                                         var count = 0
                                         while (true){
-                                            month = getMonthAsDayOfYear(dayOfYear,year.toInt())
-                                            day = getDayAsDayOfYear(dayOfYear,year.toInt())
+                                            month = getMonthAsDayOfYear(dayOfYear, year!!.toInt())
+                                            day = getDayAsDayOfYear(dayOfYear, year!!.toInt())
 
                                             Log.d("repetitionrule",repetitionRule.toString())
                                             Log.d("dayofyear",dayOfYear.toString())
@@ -93,22 +100,104 @@ class DetailActivity : AppCompatActivity() {
                                             count++
                                             Log.d("count",count.toString())
                                         }
+                                    }else if (repeatWay == "週"){
+                                        var count = 0
+                                        while (true){
+                                            month = getMonthAsDayOfYear(dayOfYear, year!!.toInt())
+                                            day = getDayAsDayOfYear(dayOfYear, year!!.toInt())
+
+                                            val task_delete_tmp = realm.where(Memo::class.java).equalTo("year",year).findAll()
+                                            val task_delete_tmp2 = task_delete_tmp.where().equalTo("month",month).findAll()
+                                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
+                                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("title",title.toString()).findAll()
+                                            val task_delete = task_delete_tmp4.where().equalTo("content",content.toString()).findAll()
+
+                                            if (task_delete.isEmpty()){
+                                                break
+                                            }
+
+                                            if (count == 100){
+                                                break
+                                            }
+
+                                            taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
+
+                                            dayOfYear = dayOfYear+repetitionRule*7
+                                            count++
+                                        }
+                                    }else if (repeatWay == "月"){
+                                        var count = 0
+                                        while (true){
+                                            val task_delete_tmp = realm.where(Memo::class.java).equalTo("year",year).findAll()
+                                            val task_delete_tmp2 = task_delete_tmp.where().equalTo("month",month).findAll()
+                                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
+                                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("title",title.toString()).findAll()
+                                            val task_delete = task_delete_tmp4.where().equalTo("content",content.toString()).findAll()
+
+                                            if (task_delete.isEmpty()){
+                                                break
+                                            }
+
+                                            if (count == 100){
+                                                break
+                                            }
+
+                                            taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
+
+                                            if (month_int != null) {
+                                                if ((month_int!! + repetitionRule).toInt() <= 12){
+                                                    month_int = month_int!! + repetitionRule
+                                                }else{
+                                                    if (year_int != null){
+                                                        year_int = year_int!! + 1
+                                                    }
+                                                    month_int = month_int!! + repetitionRule - 12
+                                                }
+                                            }
+                                            month = month_int.toString()
+                                            year = year_int.toString()
+                                            count++
+                                        }
+                                    }else if (repeatWay == "年"){
+                                        var count = 0
+                                        while (true){
+                                            val task_delete_tmp = realm.where(Memo::class.java).equalTo("year",year).findAll()
+                                            val task_delete_tmp2 = task_delete_tmp.where().equalTo("month",month).findAll()
+                                            val task_delete_tmp3 = task_delete_tmp2.where().equalTo("day",day.toString()).findAll()
+                                            val task_delete_tmp4 = task_delete_tmp3.where().equalTo("title",title.toString()).findAll()
+                                            val task_delete = task_delete_tmp4.where().equalTo("content",content.toString()).findAll()
+
+                                            if (task_delete.isEmpty()){
+                                                break
+                                            }
+
+                                            if (count == 100){
+                                                break
+                                            }
+
+                                            taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
+
+                                            year_int = year_int?.plus(repetitionRule)
+                                            year = year_int.toString()
+
+                                            count++
+                                        }
                                     }
-                                    mainIntent(year,month.toString(),day.toString(),title.toString(),content.toString(),isComplete)
+                                    mainIntent(year_now.toString(),month_now.toString(),day_now.toString(),title.toString(),content.toString(),isComplete,repeatWay.toString(),repetitionRule)
                                 }
                             }
                             )
                             .setNegativeButton("いいえ",{dialog,which ->
                                 realm.executeTransaction{
                                     taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
-                                    mainIntent(year,month.toString(),day.toString(),title.toString(),content.toString(),isComplete)
+                                    mainIntent(year_now.toString(),month_now.toString(),day_now.toString(),title.toString(),content.toString(),isComplete,repeatWay.toString(),repetitionRule)
                                 }
                             })
                                 .show()
                     }else{
                         realm.executeTransaction{
                             taskDelete(content.toString(),title.toString(),day.toString(),month.toString(),year.toString())
-                            mainIntent(year,month.toString(),day.toString(),title.toString(),content.toString(),isComplete)
+                            mainIntent(year_now.toString(),month_now.toString(),day_now.toString(),title.toString(),content.toString(),isComplete,repeatWay.toString(),repetitionRule)
                         }
                     }
                 })
@@ -361,7 +450,7 @@ class DetailActivity : AppCompatActivity() {
         task_delete.deleteFromRealm(0)
     }
 
-    fun mainIntent(year:String,month: String,day:String,title: String,content: String,isComplete:Boolean){
+    fun mainIntent(year:String,month: String,day:String,title: String,content: String,isComplete:Boolean,repeatWay:String,repetitionRule:Int){
         val mainIntent = Intent(this,MainActivity::class.java).run {
             val condition = 2
             putExtra("year",year)
@@ -371,6 +460,8 @@ class DetailActivity : AppCompatActivity() {
             putExtra("content",content)
             putExtra("isComplete",isComplete)
             putExtra("condition",condition)
+            putExtra("repeatWay",repeatWay)
+            putExtra("repetitionRule",repetitionRule)
         }
         startActivity(mainIntent)
     }

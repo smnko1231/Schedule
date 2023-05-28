@@ -52,6 +52,7 @@ class scheduleEdit : AppCompatActivity() {
         val reconstruction = intent.getIntExtra("reconstruction",0)
         val condition = intent.getStringExtra("condition")
 
+
         binding.titleEdit.setText(intent.getStringExtra("flag"))
 
         var repeat = ""
@@ -62,6 +63,8 @@ class scheduleEdit : AppCompatActivity() {
         var year = intent.getStringExtra("year")
         var month = intent.getStringExtra("month")
         var day = intent.getStringExtra("day")
+        val intentRepeatWay = intent.getStringExtra("repeatWay")
+        val intentRepetitionRule = intent.getIntExtra("repetitionRule",1)
 
         yeartoadd = year!!.toInt()
         monthtoadd = month!!.toInt()-1
@@ -83,6 +86,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatMonthSwich.visibility = View.GONE
             binding.repeatYearSwich.visibility = View.GONE
             binding.repeatCustom.visibility = View.GONE
+            binding.dateChangeButton.visibility = View.GONE
         }else{
             Log.d("reconstruction",reconstruction.toString())
             binding.repeatDaySwich.visibility = View.VISIBLE
@@ -90,6 +94,7 @@ class scheduleEdit : AppCompatActivity() {
             binding.repeatMonthSwich.visibility = View.VISIBLE
             binding.repeatYearSwich.visibility = View.VISIBLE
             binding.repeatCustom.visibility = View.VISIBLE
+            binding.dateChangeButton.visibility = View.VISIBLE
         }
 
         val spinnerItems = arrayOf("未選択","日","週","月")
@@ -154,17 +159,24 @@ class scheduleEdit : AppCompatActivity() {
             var day_int = day?.toInt()
             var month_int = month?.toInt()
             var year_int = year?.toInt()
+            var current_year = year_int
             val isComplete = intent.getBooleanExtra("isComplete",false)
             var intent_condition = intent.getIntExtra("condition",0)
             Log.d("customedit",binding.customEditText.text.toString())
 
             if (binding.customEditText.text.toString() != ""){
                 repetition_rule = binding.customEditText.text.toString().toInt()
-                repeatWay = binding.repeatSpinner.toString()
+                repeatWay = binding.repeatSpinner.selectedItem.toString()
                 Log.d("repetition_rule",repetition_rule.toString())
             }
 
-            val a = 0
+            if (reconstruction == 1){
+                repeat = intentRepeatWay.toString()
+                repeatWay = repeat
+                repetition_rule = intentRepetitionRule
+                Log.d("returnRepeatWay",repeat)
+                Log.d("returnRepetitionRule",repetition_rule.toString())
+            }
 
             if (title.equals("")){
                 AlertDialog.Builder(this)
@@ -191,21 +203,31 @@ class scheduleEdit : AppCompatActivity() {
                             if (dayOfYear != null){
                                 dayOfYear = dayOfYear + repetition_rule
                             }
-                            if (year_int != null){
-                                if (year_int % 100 == 0){
-                                    if (year_int % 400 == 0){
+                            if (current_year != null){
+                                if (current_year % 100 == 0){
+                                    if (current_year % 400 == 0){
+                                        Log.d("current_year",current_year.toString())
                                         leap = 1
                                     }else{
+                                        Log.d("current_year",current_year.toString())
                                         leap = 0
                                     }
-                                }else if (year_int % 4 == 0){
+                                }else if (current_year % 4 == 0){
                                     leap = 1
                                 }else{
-                                    leap = 0
+                                    if ((current_year+1) % 4 == 0){
+                                        Log.d("current_year",current_year.toString())
+                                        leap = 2
+                                    }else{
+                                        Log.d("current_year",current_year.toString())
+                                        leap = 0
+                                    }
                                 }
                             }
+                            Log.d("leap",leap.toString())
+
                             if (leap == 1){
-                                if (dayOfYear >= 336){
+                                if (dayOfYear >= 336 && dayOfYear <= 366){
                                     day_int = dayOfYear-335
                                     month_int = 12
                                 }else if (dayOfYear >= 306) {
@@ -242,8 +264,34 @@ class scheduleEdit : AppCompatActivity() {
                                     day_int = dayOfYear
                                     month_int = 1
                                 }
-                            }else{
-                                if (dayOfYear >= 335){
+
+                                if (dayOfYear >= 457){
+                                    day_int = dayOfYear-456
+                                    month_int = 4
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 426){
+                                    day_int = dayOfYear-425
+                                    month_int = 3
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 398){
+                                    day_int = dayOfYear-397
+                                    month_int = 2
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 367){
+                                    day_int = dayOfYear-366
+                                    month_int = 1
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }
+                            }else if (leap == 0) {
+                                if (dayOfYear >= 335 && dayOfYear <= 365){
                                     day_int = dayOfYear-334
                                     month_int = 12
                                 }else if (dayOfYear >= 305) {
@@ -280,9 +328,103 @@ class scheduleEdit : AppCompatActivity() {
                                     day_int = dayOfYear
                                     month_int = 1
                                 }
+
+                                if (dayOfYear >= 456){
+                                    day_int = dayOfYear-455
+                                    month_int = 4
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 425){
+                                    day_int = dayOfYear-424
+                                    month_int = 3
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 397){
+                                    day_int = dayOfYear-396
+                                    month_int = 2
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 366){
+                                    day_int = dayOfYear-365
+                                    month_int = 1
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }
+                            }else{
+                                if (dayOfYear >= 335 && dayOfYear <= 365){
+                                    day_int = dayOfYear-334
+                                    month_int = 12
+                                }else if (dayOfYear >= 305) {
+                                    day_int = dayOfYear-304
+                                    month_int = 11
+                                }else if (dayOfYear >= 274) {
+                                    day_int = dayOfYear-273
+                                    month_int = 10
+                                }else if (dayOfYear >= 244) {
+                                    day_int = dayOfYear-243
+                                    month_int = 9
+                                }else if (dayOfYear >= 213) {
+                                    day_int = dayOfYear-212
+                                    month_int = 8
+                                }else if (dayOfYear >= 182) {
+                                    day_int = dayOfYear-181
+                                    month_int = 7
+                                }else if (dayOfYear >= 152) {
+                                    day_int = dayOfYear-151
+                                    month_int = 6
+                                }else if (dayOfYear >= 121) {
+                                    day_int = dayOfYear-120
+                                    month_int = 5
+                                }else if (dayOfYear >= 91) {
+                                    day_int = dayOfYear-90
+                                    month_int = 4
+                                }else if (dayOfYear >= 60) {
+                                    day_int = dayOfYear-59
+                                    month_int = 3
+                                }else if (dayOfYear >= 32) {
+                                    day_int = dayOfYear-31
+                                    month_int = 2
+                                }else{
+                                    day_int = dayOfYear
+                                    month_int = 1
+                                }
+
+                                if (dayOfYear >= 457){
+                                    day_int = dayOfYear-456
+                                    month_int = 4
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 426){
+                                    day_int = dayOfYear-425
+                                    month_int = 3
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 397){
+                                    day_int = dayOfYear-396
+                                    month_int = 2
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }else if (dayOfYear >= 366){
+                                    day_int = dayOfYear-365
+                                    month_int = 1
+                                    if (current_year != null) {
+                                        year_int = current_year+1
+                                    }
+                                }
                             }
+                            year = year_int.toString()
                             month = month_int.toString()
                             day = day_int.toString()
+                            Log.d("repeatdayofyear",dayOfYear.toString())
+                            Log.d("repeatyear",year.toString())
+                            Log.d("repeatmonth",month.toString())
                             Log.d("repeatday",day.toString())
                         }
                     }else if ((binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == true && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == false) || repeat == "週"){
@@ -389,8 +531,16 @@ class scheduleEdit : AppCompatActivity() {
                         for (i in 1..12/repetition_rule){
                             save(year.toString(),month.toString(),day.toString() ,title,content,isComplete,repetition_rule,repeatWay)
                             if (month_int != null){
-                                month_int = month_int + repetition_rule
+                                if (month_int + repetition_rule <= 12){
+                                    month_int = month_int + repetition_rule
+                                }else{
+                                    if (year_int != null){
+                                        year_int++
+                                    }
+                                    month_int = month_int + repetition_rule - 12
+                                }
                             }
+                            year = year_int.toString()
                             month = month_int.toString()
                         }
                     }else if (binding.repeatDaySwich.isChecked == false &&  binding.repeatWeekSwich.isChecked == false && binding.repeatMonthSwich.isChecked == false && binding.repeatYearSwich.isChecked == true){

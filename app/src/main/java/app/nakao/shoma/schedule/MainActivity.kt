@@ -81,6 +81,8 @@ class MainActivity : AppCompatActivity() {
         var today_day = 0
         val requestcode = (1..100)
         val requestcode2 = (1..100)
+        val repeatWay = intent.getStringExtra("repeatWay")
+        val repetitionRule = intent.getIntExtra("repetitionRule",1)
 
         if (Flag == "today"){
             today_day = dt.dayOfMonth
@@ -164,6 +166,7 @@ class MainActivity : AppCompatActivity() {
                 Snackbar.make(binding.container, "削除しました!", Snackbar.LENGTH_SHORT)
                     .setAction("元に戻す") {
                         condition = 1
+                        Log.d("returnRepeatWay",repeatWay.toString())
                         val scheduleIntent = Intent(this, scheduleEdit::class.java).run {
                             putExtra("year", intent_year)
                             putExtra("month", intent_month)
@@ -173,6 +176,8 @@ class MainActivity : AppCompatActivity() {
                             putExtra("isComplete", intent_isComplete)
                             putExtra("reconstruction", 1)
                             putExtra("condition", condition)
+                            putExtra("repeatWay",repeatWay)
+                            putExtra("repetitionRule",repetitionRule)
                         }
                         startActivity(scheduleIntent)
                     }
